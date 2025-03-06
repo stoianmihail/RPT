@@ -1,0 +1,62 @@
+{
+   "name":  "Query", 
+   "result": 0.000474,
+   "timing": 0.000474,
+   "cardinality": 0,
+   "extra-info": "-- PRAGMA profiling_mode = 'detailed';\n;\nselect\r\n\t100.00 * sum(case\r\n\t\twhen p_type like 'PROMO%'\r\n\t\t\tthen l_extendedprice * (1 - l_discount)\r\n\t\telse 0\r\n\tend) / sum(l_extendedprice * (1 - l_discount)) as promo_revenue\r\nfrom\r\n\tlineitem,\r\n\tpart\r\nwhere\r\n\tl_partkey = p_partkey\r\n\tand l_shipdate >= date ':1'\r\n\tand l_shipdate < date ':1' + interval '1' month;\r;\n\nPRAGMA profile_output='./query-log/tpch-sf1/tpch/hausberg-1-threads/duckdb-20250306-15-10-11/hot/14.json';\nselect\r\n\t100.00 * sum(case\r\n\t\twhen p_type like 'PROMO%'\r\n\t\t\tthen l_extendedprice * (1 - l_discount)\r\n\t\telse 0\r\n\tend) / sum(l_extendedprice * (1 - l_discount)) as promo_revenue\r\nfrom\r\n\tlineitem,\r\n\tpart\r\nwhere\r\n\tl_partkey = p_partkey\r\n\tand l_shipdate >= date ':1'\r\n\tand l_shipdate < date ':1' + interval '1' month;\r;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000008,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "PROJECTION",
+         "timing":0.000004,
+         "cardinality":1,
+         "extra_info": "promo_revenue\n",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "UNGROUPED_AGGREGATE",
+            "timing":0.000006,
+            "cardinality":1,
+            "extra_info": "sum(#0)\nsum(#1)",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "PROJECTION",
+               "timing":0.000000,
+               "cardinality":0,
+               "extra_info": "CASE  WHEN (prefix(p_type, 'PROMO')) THEN ((l_extendedprice * (1.00 - l_discount))) ELSE 0.0000 END\n(l_extendedprice * (1.00 - l_discount))\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "EMPTY_RESULT",
+                  "timing":0.000000,
+                  "cardinality":0,
+                  "extra_info": "",
+                  "timings": [
+                  ],
+                  "children": [
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

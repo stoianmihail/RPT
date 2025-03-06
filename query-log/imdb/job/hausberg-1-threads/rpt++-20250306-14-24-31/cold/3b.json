@@ -1,0 +1,195 @@
+{
+   "name":  "Query", 
+   "result": 2.567372,
+   "timing": 2.567372,
+   "cardinality": 0,
+   "extra-info": "-- PRAGMA profiling_mode = 'detailed';\n;\nSELECT min(t.title) AS movie_title\nFROM keyword AS k,\n     movie_info AS mi,\n     movie_keyword AS mk,\n     title AS t\nWHERE k.keyword like '%sequel%'\n  AND mi.info IN ('Bulgaria')\n  AND t.production_year > 2010\n  AND t.id = mi.movie_id\n  AND t.id = mk.movie_id\n  AND mk.movie_id = mi.movie_id\n  AND k.id = mk.keyword_id;;\n\nPRAGMA profile_output='./query-log/imdb/job/hausberg-1-threads/rpt++-20250306-14-24-31/hot/3b.json';\nSELECT min(t.title) AS movie_title\nFROM keyword AS k,\n     movie_info AS mi,\n     movie_keyword AS mk,\n     title AS t\nWHERE k.keyword like '%sequel%'\n  AND mi.info IN ('Bulgaria')\n  AND t.production_year > 2010\n  AND t.id = mi.movie_id\n  AND t.id = mk.movie_id\n  AND mk.movie_id = mi.movie_id\n  AND k.id = mk.keyword_id;;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000002,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "UNGROUPED_AGGREGATE",
+         "timing":0.000632,
+         "cardinality":1,
+         "extra_info": "min(#0)",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "PROJECTION",
+            "timing":0.000001,
+            "cardinality":5,
+            "extra_info": "title\n",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "HASH_JOIN",
+               "timing":0.000251,
+               "cardinality":5,
+               "extra_info": "INNER\nmovie_id = id\n\n[INFOSEPARATOR]\nEC: 217266\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "USE_BF",
+                  "timing":0.000032,
+                  "cardinality":24,
+                  "extra_info": "",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "FILTER",
+                     "timing":0.034613,
+                     "cardinality":2287,
+                     "extra_info": "(info = 'Bulgaria')\n[INFOSEPARATOR]\nEC: 2967144",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "SEQ_SCAN ",
+                        "timing":2.064484,
+                        "cardinality":14835720,
+                        "extra_info": "movie_info\n[INFOSEPARATOR]\ninfo\nmovie_id\n[INFOSEPARATOR]\nEC: 2967144",
+                        "timings": [
+                        ],
+                        "children": [
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+,
+                {
+                  "name": "HASH_JOIN",
+                  "timing":0.000238,
+                  "cardinality":405,
+                  "extra_info": "INNER\nkeyword_id = id\n\n[INFOSEPARATOR]\nEC: 183867\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "HASH_JOIN",
+                     "timing":0.025149,
+                     "cardinality":2246,
+                     "extra_info": "INNER\nmovie_id = id\n\n[INFOSEPARATOR]\nEC: 911013\n",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "CREATE_BF",
+                        "timing":0.000240,
+                        "cardinality":2916,
+                        "extra_info": "",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "USE_BF",
+                           "timing":0.000380,
+                           "cardinality":2916,
+                           "extra_info": "",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "USE_BF",
+                              "timing":0.029029,
+                              "cardinality":39671,
+                              "extra_info": "",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "SEQ_SCAN ",
+                                 "timing":0.067682,
+                                 "cardinality":4523930,
+                                 "extra_info": "movie_keyword\n[INFOSEPARATOR]\nmovie_id\nkeyword_id\n[INFOSEPARATOR]\nEC: 4523930",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+,
+                      {
+                        "name": "CREATE_BF",
+                        "timing":0.037014,
+                        "cardinality":391666,
+                        "extra_info": "",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "SEQ_SCAN ",
+                           "timing":0.274847,
+                           "cardinality":391666,
+                           "extra_info": "title\n[INFOSEPARATOR]\nid\ntitle\n[INFOSEPARATOR]\nFilters: production_year>2010 AND production_year IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 505662",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+,
+                   {
+                     "name": "CREATE_BF",
+                     "timing":0.002552,
+                     "cardinality":30,
+                     "extra_info": "",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "FILTER",
+                        "timing":0.003942,
+                        "cardinality":30,
+                        "extra_info": "contains(keyword, 'sequel')\n[INFOSEPARATOR]\nEC: 26834",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "SEQ_SCAN ",
+                           "timing":0.014569,
+                           "cardinality":134170,
+                           "extra_info": "keyword\n[INFOSEPARATOR]\nkeyword\nid\n[INFOSEPARATOR]\nEC: 26834",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

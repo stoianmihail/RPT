@@ -1,0 +1,247 @@
+{
+   "name":  "Query", 
+   "result": 0.380858,
+   "timing": 0.380858,
+   "cardinality": 0,
+   "extra-info": "SELECT min(t.title) AS typical_european_movie\nFROM company_type AS ct,\n     info_type AS it,\n     movie_companies AS mc,\n     movie_info AS mi,\n     title AS t\nWHERE ct.kind = 'production companies'\n  AND mc.note like '%(theatrical)%'\n  AND mc.note like '%(France)%'\n  AND mi.info IN ('Sweden',\n                  'Norway',\n                  'Germany',\n                  'Denmark',\n                  'Swedish',\n                  'Denish',\n                  'Norwegian',\n                  'German')\n  AND t.production_year > 2005\n  AND t.id = mi.movie_id\n  AND t.id = mc.movie_id\n  AND mc.movie_id = mi.movie_id\n  AND ct.id = mc.company_type_id\n  AND it.id = mi.info_type_id;;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000002,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "UNGROUPED_AGGREGATE",
+         "timing":0.000001,
+         "cardinality":1,
+         "extra_info": "min(#0)",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "PROJECTION",
+            "timing":0.000000,
+            "cardinality":0,
+            "extra_info": "title\n",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "HASH_JOIN",
+               "timing":0.000055,
+               "cardinality":0,
+               "extra_info": "INNER\ninfo_type_id = id\n\n[INFOSEPARATOR]\nEC: 27170\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "HASH_JOIN",
+                  "timing":0.000000,
+                  "cardinality":0,
+                  "extra_info": "INNER\nmovie_id = id\n\n[INFOSEPARATOR]\nEC: 26929\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "USE_BF",
+                     "timing":0.000066,
+                     "cardinality":0,
+                     "extra_info": "",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "PROJECTION",
+                        "timing":0.000005,
+                        "cardinality":3917,
+                        "extra_info": "#1\n#2\n#3\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "FILTER",
+                           "timing":0.000189,
+                           "cardinality":3917,
+                           "extra_info": "IN (...)\n[INFOSEPARATOR]\nEC: 2967144",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "HASH_JOIN",
+                              "timing":0.001191,
+                              "cardinality":102400,
+                              "extra_info": "MARK\ninfo = #0\n\n[INFOSEPARATOR]\nEC: 2967144\n",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "SEQ_SCAN ",
+                                 "timing":0.000244,
+                                 "cardinality":102400,
+                                 "extra_info": "movie_info\n[INFOSEPARATOR]\ninfo\nmovie_id\ninfo_type_id\n[INFOSEPARATOR]\nEC: 2967144",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                 ]
+                               }
+,
+                               {
+                                 "name": "COLUMN_DATA_SCAN",
+                                 "timing":0.000003,
+                                 "cardinality":8,
+                                 "extra_info": "",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+,
+                   {
+                     "name": "HASH_JOIN",
+                     "timing":0.000026,
+                     "cardinality":0,
+                     "extra_info": "INNER\ncompany_type_id = id\n\n[INFOSEPARATOR]\nEC: 24468\n",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "HASH_JOIN",
+                        "timing":0.062309,
+                        "cardinality":0,
+                        "extra_info": "INNER\nmovie_id = id\n\n[INFOSEPARATOR]\nEC: 97874\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "CREATE_BF",
+                           "timing":0.000013,
+                           "cardinality":0,
+                           "extra_info": "",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "USE_BF",
+                              "timing":0.000000,
+                              "cardinality":0,
+                              "extra_info": "",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "USE_BF",
+                                 "timing":0.000265,
+                                 "cardinality":0,
+                                 "extra_info": "",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "FILTER",
+                                    "timing":0.044777,
+                                    "cardinality":24025,
+                                    "extra_info": "(contains(note, '(theatrical)') AND contains(note, '(France)'))\n[INFOSEPARATOR]\nEC: 521825",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "SEQ_SCAN ",
+                                       "timing":0.060684,
+                                       "cardinality":2609129,
+                                       "extra_info": "movie_companies\n[INFOSEPARATOR]\nnote\nmovie_id\ncompany_type_id\n[INFOSEPARATOR]\nEC: 521825",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                       ]
+                                     }
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+,
+                         {
+                           "name": "CREATE_BF",
+                           "timing":0.076331,
+                           "cardinality":1012920,
+                           "extra_info": "",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "SEQ_SCAN ",
+                              "timing":0.125574,
+                              "cardinality":1012920,
+                              "extra_info": "title\n[INFOSEPARATOR]\nid\ntitle\n[INFOSEPARATOR]\nFilters: production_year>2005 AND production_year IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 505662",
+                              "timings": [
+                              ],
+                              "children": [
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+,
+                      {
+                        "name": "CREATE_BF",
+                        "timing":0.000028,
+                        "cardinality":1,
+                        "extra_info": "",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "SEQ_SCAN ",
+                           "timing":0.000008,
+                           "cardinality":1,
+                           "extra_info": "company_type\n[INFOSEPARATOR]\nid\n[INFOSEPARATOR]\nFilters: kind=production companies AND kind IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 1",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+,
+                {
+                  "name": "SEQ_SCAN ",
+                  "timing":0.000010,
+                  "cardinality":113,
+                  "extra_info": "info_type\n[INFOSEPARATOR]\nid\n[INFOSEPARATOR]\nEC: 113",
+                  "timings": [
+                  ],
+                  "children": [
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

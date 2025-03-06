@@ -1,0 +1,310 @@
+{
+   "name":  "Query", 
+   "result": 3.051378,
+   "timing": 3.051378,
+   "cardinality": 0,
+   "extra-info": "-- PRAGMA profiling_mode = 'detailed';\n;\nSELECT min(mi_idx.info) AS rating,\n       min(t.title) AS north_european_dark_production\nFROM info_type AS it1,\n     info_type AS it2,\n     keyword AS k,\n     kind_type AS kt,\n     movie_info AS mi,\n     movie_info_idx AS mi_idx,\n     movie_keyword AS mk,\n     title AS t\nWHERE it1.info = 'countries'\n  AND it2.info = 'rating'\n  AND k.keyword IS NOT NULL\n  AND k.keyword in ('murder',\n                    'murder-in-title',\n                    'blood',\n                    'violence')\n  AND kt.kind in ('movie',\n                  'episode')\n  AND mi.info IN ('Sweden',\n                  'Norway',\n                  'Germany',\n                  'Denmark',\n                  'Swedish',\n                  'Danish',\n                  'Norwegian',\n                  'German',\n                  'USA',\n                  'American')\n  AND mi_idx.info < '8.5'\n  AND t.production_year > 2005\n  AND kt.id = t.kind_id\n  AND t.id = mi.movie_id\n  AND t.id = mk.movie_id\n  AND t.id = mi_idx.movie_id\n  AND mk.movie_id = mi.movie_id\n  AND mk.movie_id = mi_idx.movie_id\n  AND mi.movie_id = mi_idx.movie_id\n  AND k.id = mk.keyword_id\n  AND it1.id = mi.info_type_id\n  AND it2.id = mi_idx.info_type_id;;\n\nPRAGMA profile_output='./query-log/imdb/job/hausberg-1-threads/duckdb-20250306-14-05-54/hot/14c.json';\nSELECT min(mi_idx.info) AS rating,\n       min(t.title) AS north_european_dark_production\nFROM info_type AS it1,\n     info_type AS it2,\n     keyword AS k,\n     kind_type AS kt,\n     movie_info AS mi,\n     movie_info_idx AS mi_idx,\n     movie_keyword AS mk,\n     title AS t\nWHERE it1.info = 'countries'\n  AND it2.info = 'rating'\n  AND k.keyword IS NOT NULL\n  AND k.keyword in ('murder',\n                    'murder-in-title',\n                    'blood',\n                    'violence')\n  AND kt.kind in ('movie',\n                  'episode')\n  AND mi.info IN ('Sweden',\n                  'Norway',\n                  'Germany',\n                  'Denmark',\n                  'Swedish',\n                  'Danish',\n                  'Norwegian',\n                  'German',\n                  'USA',\n                  'American')\n  AND mi_idx.info < '8.5'\n  AND t.production_year > 2005\n  AND kt.id = t.kind_id\n  AND t.id = mi.movie_id\n  AND t.id = mk.movie_id\n  AND t.id = mi_idx.movie_id\n  AND mk.movie_id = mi.movie_id\n  AND mk.movie_id = mi_idx.movie_id\n  AND mi.movie_id = mi_idx.movie_id\n  AND k.id = mk.keyword_id\n  AND it1.id = mi.info_type_id\n  AND it2.id = mi_idx.info_type_id;;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000001,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "UNGROUPED_AGGREGATE",
+         "timing":0.000476,
+         "cardinality":1,
+         "extra_info": "min(#0)\nmin(#1)",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "PROJECTION",
+            "timing":0.000001,
+            "cardinality":4115,
+            "extra_info": "info\ntitle\n",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "HASH_JOIN",
+               "timing":0.034480,
+               "cardinality":4115,
+               "extra_info": "INNER\nid = keyword_id\n\n[INFOSEPARATOR]\nEC: 0\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "FILTER",
+                  "timing":0.000638,
+                  "cardinality":3,
+                  "extra_info": "((keyword = 'murder') OR (keyword = 'murder-in-title') OR (keyword = 'blood') OR (keyword = 'violence'))\n[INFOSEPARATOR]\nEC: 26834",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "SEQ_SCAN ",
+                     "timing":0.010525,
+                     "cardinality":134170,
+                     "extra_info": "keyword\n[INFOSEPARATOR]\nkeyword\nid\n[INFOSEPARATOR]\nEC: 26834",
+                     "timings": [
+                     ],
+                     "children": [
+                     ]
+                   }
+                  ]
+                }
+,
+                {
+                  "name": "HASH_JOIN",
+                  "timing":0.049993,
+                  "cardinality":460150,
+                  "extra_info": "INNER\nmovie_id = id\nmovie_id = movie_id\nmovie_id = movie_id\n\n[INFOSEPARATOR]\nEC: 1\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "SEQ_SCAN ",
+                     "timing":0.062296,
+                     "cardinality":4523924,
+                     "extra_info": "movie_keyword\n[INFOSEPARATOR]\nmovie_id\nkeyword_id\n[INFOSEPARATOR]\nFilters: movie_id<=2525793 AND movie_id IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 4523930",
+                     "timings": [
+                     ],
+                     "children": [
+                     ]
+                   }
+,
+                   {
+                     "name": "HASH_JOIN",
+                     "timing":0.000213,
+                     "cardinality":44414,
+                     "extra_info": "INNER\ninfo_type_id = id\n\n[INFOSEPARATOR]\nEC: 0\n",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "HASH_JOIN",
+                        "timing":0.077605,
+                        "cardinality":50884,
+                        "extra_info": "INNER\nmovie_id = id\nmovie_id = movie_id\n\n[INFOSEPARATOR]\nEC: 83\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "PROJECTION",
+                           "timing":0.000174,
+                           "cardinality":716196,
+                           "extra_info": "#0\n#1\n",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "FILTER",
+                              "timing":0.003191,
+                              "cardinality":716196,
+                              "extra_info": "(movie_id BETWEEN 2 AND 2525793)\n[INFOSEPARATOR]\nEC: 2967144",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "PROJECTION",
+                                 "timing":0.000260,
+                                 "cardinality":716210,
+                                 "extra_info": "#1\n#2\n#3\n",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "FILTER",
+                                    "timing":0.020663,
+                                    "cardinality":716210,
+                                    "extra_info": "IN (...)\n[INFOSEPARATOR]\nEC: 2967144",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "HASH_JOIN",
+                                       "timing":0.399141,
+                                       "cardinality":14835720,
+                                       "extra_info": "MARK\ninfo = #0\n\n[INFOSEPARATOR]\nEC: 14835720\n",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                        {
+                                          "name": "SEQ_SCAN ",
+                                          "timing":1.977574,
+                                          "cardinality":14835720,
+                                          "extra_info": "movie_info\n[INFOSEPARATOR]\ninfo\nmovie_id\ninfo_type_id\n[INFOSEPARATOR]\nEC: 14835720",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                          ]
+                                        }
+,
+                                        {
+                                          "name": "COLUMN_DATA_SCAN",
+                                          "timing":0.000010,
+                                          "cardinality":10,
+                                          "extra_info": "",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                          ]
+                                        }
+                                       ]
+                                     }
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+,
+                         {
+                           "name": "HASH_JOIN",
+                           "timing":0.002902,
+                           "cardinality":106971,
+                           "extra_info": "INNER\nkind_id = id\n\n[INFOSEPARATOR]\nEC: 70\n",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "HASH_JOIN",
+                              "timing":0.050577,
+                              "cardinality":140455,
+                              "extra_info": "INNER\nid = movie_id\n\n[INFOSEPARATOR]\nEC: 496\n",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "FILTER",
+                                 "timing":0.004296,
+                                 "cardinality":1012657,
+                                 "extra_info": "(id BETWEEN 2 AND 2525793)\n[INFOSEPARATOR]\nEC: 505662",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "SEQ_SCAN ",
+                                    "timing":0.250917,
+                                    "cardinality":1012920,
+                                    "extra_info": "title\n[INFOSEPARATOR]\nkind_id\nid\ntitle\n[INFOSEPARATOR]\nFilters: production_year>2005 AND production_year IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 505662",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                    ]
+                                  }
+                                 ]
+                               }
+,
+                               {
+                                 "name": "HASH_JOIN",
+                                 "timing":0.003108,
+                                 "cardinality":454230,
+                                 "extra_info": "INNER\ninfo_type_id = id\n\n[INFOSEPARATOR]\nEC: 2464\n",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "SEQ_SCAN ",
+                                    "timing":0.050778,
+                                    "cardinality":1337634,
+                                    "extra_info": "movie_info_idx\n[INFOSEPARATOR]\ninfo\nmovie_id\ninfo_type_id\n[INFOSEPARATOR]\nFilters: info<8.5 AND info IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 276007",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                    ]
+                                  }
+,
+                                  {
+                                    "name": "FILTER",
+                                    "timing":0.000013,
+                                    "cardinality":1,
+                                    "extra_info": "(id >= 99)\n[INFOSEPARATOR]\nEC: 1",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "SEQ_SCAN ",
+                                       "timing":0.000020,
+                                       "cardinality":1,
+                                       "extra_info": "info_type\n[INFOSEPARATOR]\nid\n[INFOSEPARATOR]\nFilters: info=rating AND info IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 1",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                       ]
+                                     }
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+,
+                            {
+                              "name": "FILTER",
+                              "timing":0.000656,
+                              "cardinality":2,
+                              "extra_info": "((kind = 'movie') OR (kind = 'episode'))\n[INFOSEPARATOR]\nEC: 1",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "SEQ_SCAN ",
+                                 "timing":0.000009,
+                                 "cardinality":7,
+                                 "extra_info": "kind_type\n[INFOSEPARATOR]\nkind\nid\n[INFOSEPARATOR]\nEC: 1",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+,
+                      {
+                        "name": "FILTER",
+                        "timing":0.000399,
+                        "cardinality":1,
+                        "extra_info": "(id <= 110)\n[INFOSEPARATOR]\nEC: 1",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "SEQ_SCAN ",
+                           "timing":0.001093,
+                           "cardinality":1,
+                           "extra_info": "info_type\n[INFOSEPARATOR]\nid\n[INFOSEPARATOR]\nFilters: info=countries AND info IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 1",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

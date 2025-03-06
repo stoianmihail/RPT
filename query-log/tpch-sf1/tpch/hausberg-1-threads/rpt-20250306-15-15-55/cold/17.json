@@ -1,0 +1,287 @@
+{
+   "name":  "Query", 
+   "result": 0.413647,
+   "timing": 0.413647,
+   "cardinality": 0,
+   "extra-info": "-- PRAGMA profiling_mode = 'detailed';\n;\nselect\r\n        sum(l_extendedprice) / 7.0 as avg_yearly\r\nfrom\r\n        lineitem,\r\n        part\r\nwhere\r\n        p_partkey = l_partkey\r\n        and p_brand = 'Brand#23'\r\n        and p_container = 'MED BOX'\r\n        and l_quantity < (\r\n                select\r\n                        0.2 * avg(l_quantity)\r\n                from\r\n                        lineitem\r\n                where\r\n                        l_partkey = p_partkey\r\n        );;\n\nPRAGMA profile_output='./query-log/tpch-sf1/tpch/hausberg-1-threads/rpt-20250306-15-15-55/hot/17.json';\nselect\r\n        sum(l_extendedprice) / 7.0 as avg_yearly\r\nfrom\r\n        lineitem,\r\n        part\r\nwhere\r\n        p_partkey = l_partkey\r\n        and p_brand = 'Brand#23'\r\n        and p_container = 'MED BOX'\r\n        and l_quantity < (\r\n                select\r\n                        0.2 * avg(l_quantity)\r\n                from\r\n                        lineitem\r\n                where\r\n                        l_partkey = p_partkey\r\n        );;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000001,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "PROJECTION",
+         "timing":0.000221,
+         "cardinality":1,
+         "extra_info": "avg_yearly\n",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "UNGROUPED_AGGREGATE",
+            "timing":0.000553,
+            "cardinality":1,
+            "extra_info": "sum(#0)",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "PROJECTION",
+               "timing":0.000000,
+               "cardinality":587,
+               "extra_info": "l_extendedprice\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "PROJECTION",
+                  "timing":0.000001,
+                  "cardinality":587,
+                  "extra_info": "#0\n#3\n#4\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "FILTER",
+                     "timing":0.001092,
+                     "cardinality":587,
+                     "extra_info": "(CAST(l_quantity AS DOUBLE) < SUBQUERY)\n[INFOSEPARATOR]\nEC: 3000607",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "RIGHT_DELIM_JOIN",
+                        "timing":0.001725,
+                        "cardinality":0,
+                        "extra_info": "RIGHT\np_partkey IS NOT DISTINCT FROM p_partkey\n\n[INFOSEPARATOR]\nEC: 3000607\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "HASH_JOIN",
+                           "timing":0.001472,
+                           "cardinality":6088,
+                           "extra_info": "INNER\nl_partkey = p_partkey\n\n[INFOSEPARATOR]\nEC: 80175\n",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "CREATE_BF",
+                              "timing":0.003219,
+                              "cardinality":122003,
+                              "extra_info": "",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "USE_BF",
+                                 "timing":0.047111,
+                                 "cardinality":122003,
+                                 "extra_info": "",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "SEQ_SCAN ",
+                                    "timing":0.295508,
+                                    "cardinality":6001215,
+                                    "extra_info": "lineitem\n[INFOSEPARATOR]\nl_partkey\nl_quantity\nl_extendedprice\n[INFOSEPARATOR]\nEC: 6001215",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+,
+                            {
+                              "name": "USE_BF",
+                              "timing":0.000014,
+                              "cardinality":204,
+                              "extra_info": "",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "CREATE_BF",
+                                 "timing":0.002571,
+                                 "cardinality":204,
+                                 "extra_info": "",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "SEQ_SCAN ",
+                                    "timing":0.007223,
+                                    "cardinality":204,
+                                    "extra_info": "part\n[INFOSEPARATOR]\np_partkey\n[INFOSEPARATOR]\nFilters: p_brand=Brand#23 AND p_brand IS NOT NULL\np_container=MED BOX AND p_container IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 5000",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+,
+                         {
+                           "name": "HASH_JOIN",
+                           "timing":0.000686,
+                           "cardinality":6088,
+                           "extra_info": "RIGHT\np_partkey IS NOT DISTINCT FROM p_partkey\n\n[INFOSEPARATOR]\nEC: 3000607\n",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "PROJECTION",
+                              "timing":0.000562,
+                              "cardinality":204,
+                              "extra_info": "(0.2 * avg(l_quantity))\np_partkey\n",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "HASH_GROUP_BY",
+                                 "timing":0.000639,
+                                 "cardinality":204,
+                                 "extra_info": "#0\navg(#1)",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "PROJECTION",
+                                    "timing":0.000008,
+                                    "cardinality":6088,
+                                    "extra_info": "p_partkey\nl_quantity\n",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "HASH_JOIN",
+                                       "timing":0.001301,
+                                       "cardinality":6088,
+                                       "extra_info": "INNER\nl_partkey = p_partkey\n\n[INFOSEPARATOR]\nEC: 6001215\n",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                        {
+                                          "name": "CREATE_BF",
+                                          "timing":0.001695,
+                                          "cardinality":122003,
+                                          "extra_info": "",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                           {
+                                             "name": "USE_BF",
+                                             "timing":0.034013,
+                                             "cardinality":122003,
+                                             "extra_info": "",
+                                             "timings": [
+                                             ],
+                                             "children": [
+                                              {
+                                                "name": "SEQ_SCAN ",
+                                                "timing":0.008960,
+                                                "cardinality":6001215,
+                                                "extra_info": "lineitem\n[INFOSEPARATOR]\nl_partkey\nl_quantity\n[INFOSEPARATOR]\nEC: 6001215",
+                                                "timings": [
+                                                ],
+                                                "children": [
+                                                ]
+                                              }
+                                             ]
+                                           }
+                                          ]
+                                        }
+,
+                                        {
+                                          "name": "USE_BF",
+                                          "timing":0.000006,
+                                          "cardinality":204,
+                                          "extra_info": "",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                           {
+                                             "name": "CREATE_BF",
+                                             "timing":0.000023,
+                                             "cardinality":204,
+                                             "extra_info": "",
+                                             "timings": [
+                                             ],
+                                             "children": [
+                                              {
+                                                "name": "DELIM_SCAN",
+                                                "timing":0.000000,
+                                                "cardinality":0,
+                                                "extra_info": "",
+                                                "timings": [
+                                                ],
+                                                "children": [
+                                                ]
+                                              }
+                                             ]
+                                           }
+                                          ]
+                                        }
+                                       ]
+                                     }
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+,
+                            {
+                              "name": "DUMMY_SCAN",
+                              "timing":0.000000,
+                              "cardinality":0,
+                              "extra_info": "",
+                              "timings": [
+                              ],
+                              "children": [
+                              ]
+                            }
+                           ]
+                         }
+,
+                         {
+                           "name": "HASH_GROUP_BY",
+                           "timing":0.000005,
+                           "cardinality":204,
+                           "extra_info": "#0",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

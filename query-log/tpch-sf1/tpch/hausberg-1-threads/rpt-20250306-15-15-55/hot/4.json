@@ -1,0 +1,196 @@
+{
+   "name":  "Query", 
+   "result": 0.076791,
+   "timing": 0.076791,
+   "cardinality": 0,
+   "extra-info": "select\r\n        o_orderpriority,\r\n        count(*) as order_count\r\nfrom\r\n        orders\r\nwhere\r\n        o_orderdate >= date '1993-07-01'\r\n        and o_orderdate < date '1993-07-01' + interval '3' month\r\n        and exists (\r\n                select\r\n                        *\r\n                from\r\n                        lineitem\r\n                where\r\n                        l_orderkey = o_orderkey\r\n                        and l_commitdate < l_receiptdate\r\n        )\r\ngroup by\r\n        o_orderpriority\r\norder by\r\n        o_orderpriority;;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000004,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "ORDER_BY",
+         "timing":0.000029,
+         "cardinality":5,
+         "extra_info": "ORDERS:\norders.o_orderpriority ASC",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "HASH_GROUP_BY",
+            "timing":0.001503,
+            "cardinality":5,
+            "extra_info": "#0\ncount_star()",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "PROJECTION",
+               "timing":0.000003,
+               "cardinality":52523,
+               "extra_info": "o_orderpriority\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "RIGHT_DELIM_JOIN",
+                  "timing":0.005866,
+                  "cardinality":0,
+                  "extra_info": "RIGHT_SEMI\no_orderkey IS NOT DISTINCT FROM o_orderkey\n\n[INFOSEPARATOR]\nEC: 1200243\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "SEQ_SCAN ",
+                     "timing":0.009701,
+                     "cardinality":57218,
+                     "extra_info": "orders\n[INFOSEPARATOR]\no_orderkey\no_orderpriority\n[INFOSEPARATOR]\nFilters: o_orderdate>=1993-07-01 AND o_orderdate<1993-10-01 AND o_orderdate IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 300000",
+                     "timings": [
+                     ],
+                     "children": [
+                     ]
+                   }
+,
+                   {
+                     "name": "HASH_JOIN",
+                     "timing":0.003871,
+                     "cardinality":52523,
+                     "extra_info": "RIGHT_SEMI\no_orderkey IS NOT DISTINCT FROM o_orderkey\n\n[INFOSEPARATOR]\nEC: 1200243\n",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "PROJECTION",
+                        "timing":0.000024,
+                        "cardinality":144869,
+                        "extra_info": "o_orderkey\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "HASH_JOIN",
+                           "timing":0.005986,
+                           "cardinality":144869,
+                           "extra_info": "INNER\nl_orderkey = o_orderkey\n\n[INFOSEPARATOR]\nEC: 1200243\n",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "CREATE_BF",
+                              "timing":0.004185,
+                              "cardinality":240252,
+                              "extra_info": "",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "USE_BF",
+                                 "timing":0.023449,
+                                 "cardinality":240252,
+                                 "extra_info": "",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "FILTER",
+                                    "timing":0.005478,
+                                    "cardinality":3793296,
+                                    "extra_info": "(l_commitdate < l_receiptdate)\n[INFOSEPARATOR]\nEC: 6001215",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "SEQ_SCAN ",
+                                       "timing":0.012997,
+                                       "cardinality":6001215,
+                                       "extra_info": "lineitem\n[INFOSEPARATOR]\nl_orderkey\nl_commitdate\nl_receiptdate\n[INFOSEPARATOR]\nEC: 6001215",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                       ]
+                                     }
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+,
+                            {
+                              "name": "USE_BF",
+                              "timing":0.000414,
+                              "cardinality":52632,
+                              "extra_info": "",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "CREATE_BF",
+                                 "timing":0.000425,
+                                 "cardinality":57218,
+                                 "extra_info": "",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "DELIM_SCAN",
+                                    "timing":0.000000,
+                                    "cardinality":0,
+                                    "extra_info": "",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+,
+                      {
+                        "name": "DUMMY_SCAN",
+                        "timing":0.000000,
+                        "cardinality":0,
+                        "extra_info": "",
+                        "timings": [
+                        ],
+                        "children": [
+                        ]
+                      }
+                     ]
+                   }
+,
+                   {
+                     "name": "HASH_GROUP_BY",
+                     "timing":0.000187,
+                     "cardinality":57218,
+                     "extra_info": "#0",
+                     "timings": [
+                     ],
+                     "children": [
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

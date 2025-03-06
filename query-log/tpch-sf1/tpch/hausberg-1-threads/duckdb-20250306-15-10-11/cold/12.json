@@ -1,0 +1,62 @@
+{
+   "name":  "Query", 
+   "result": 0.001181,
+   "timing": 0.001181,
+   "cardinality": 0,
+   "extra-info": "-- PRAGMA profiling_mode = 'detailed';\n;\nselect\r\n\tl_shipmode,\r\n\tsum(case\r\n\t\twhen o_orderpriority = '1-URGENT'\r\n\t\t\tor o_orderpriority = '2-HIGH'\r\n\t\t\tthen 1\r\n\t\telse 0\r\n\tend) as high_line_count,\r\n\tsum(case\r\n\t\twhen o_orderpriority <> '1-URGENT'\r\n\t\t\tand o_orderpriority <> '2-HIGH'\r\n\t\t\tthen 1\r\n\t\telse 0\r\n\tend) as low_line_count\r\nfrom\r\n\torders,\r\n\tlineitem\r\nwhere\r\n\to_orderkey = l_orderkey\r\n\tand l_shipmode in (':1', ':2')\r\n\tand l_commitdate < l_receiptdate\r\n\tand l_shipdate < l_commitdate\r\n\tand l_receiptdate >= date ':3'\r\n\tand l_receiptdate < date ':3' + interval '1' year\r\ngroup by\r\n\tl_shipmode\r\norder by\r\n\tl_shipmode;\r;\n\nPRAGMA profile_output='./query-log/tpch-sf1/tpch/hausberg-1-threads/duckdb-20250306-15-10-11/hot/12.json';\nselect\r\n\tl_shipmode,\r\n\tsum(case\r\n\t\twhen o_orderpriority = '1-URGENT'\r\n\t\t\tor o_orderpriority = '2-HIGH'\r\n\t\t\tthen 1\r\n\t\telse 0\r\n\tend) as high_line_count,\r\n\tsum(case\r\n\t\twhen o_orderpriority <> '1-URGENT'\r\n\t\t\tand o_orderpriority <> '2-HIGH'\r\n\t\t\tthen 1\r\n\t\telse 0\r\n\tend) as low_line_count\r\nfrom\r\n\torders,\r\n\tlineitem\r\nwhere\r\n\to_orderkey = l_orderkey\r\n\tand l_shipmode in (':1', ':2')\r\n\tand l_commitdate < l_receiptdate\r\n\tand l_shipdate < l_commitdate\r\n\tand l_receiptdate >= date ':3'\r\n\tand l_receiptdate < date ':3' + interval '1' year\r\ngroup by\r\n\tl_shipmode\r\norder by\r\n\tl_shipmode;\r;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000000,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "ORDER_BY",
+         "timing":0.000000,
+         "cardinality":0,
+         "extra_info": "ORDERS:\nlineitem.l_shipmode ASC",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "HASH_GROUP_BY",
+            "timing":0.000000,
+            "cardinality":0,
+            "extra_info": "#0\nsum(#1)\nsum(#2)",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "PROJECTION",
+               "timing":0.000000,
+               "cardinality":0,
+               "extra_info": "l_shipmode\nCASE  WHEN (((o_orderpriority = '1-URGENT') OR (o_orderpriority = '2-HIGH'))) THEN (1) ELSE 0 END\nCASE  WHEN (((o_orderpriority != '1-URGENT') AND (o_orderpriority != '2-HIGH'))) THEN (1) ELSE 0 END\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "EMPTY_RESULT",
+                  "timing":0.000001,
+                  "cardinality":0,
+                  "extra_info": "",
+                  "timings": [
+                  ],
+                  "children": [
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

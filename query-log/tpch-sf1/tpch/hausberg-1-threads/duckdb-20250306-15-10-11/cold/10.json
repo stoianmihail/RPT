@@ -1,0 +1,72 @@
+{
+   "name":  "Query", 
+   "result": 0.000634,
+   "timing": 0.000634,
+   "cardinality": 0,
+   "extra-info": "-- PRAGMA profiling_mode = 'detailed';\n;\nselect\r\n\tc_custkey,\r\n\tc_name,\r\n\tsum(l_extendedprice * (1 - l_discount)) as revenue,\r\n\tc_acctbal,\r\n\tn_name,\r\n\tc_address,\r\n\tc_phone,\r\n\tc_comment\r\nfrom\r\n\tcustomer,\r\n\torders,\r\n\tlineitem,\r\n\tnation\r\nwhere\r\n\tc_custkey = o_custkey\r\n\tand l_orderkey = o_orderkey\r\n\tand o_orderdate >= date ':1'\r\n\tand o_orderdate < date ':1' + interval '3' month\r\n\tand l_returnflag = 'R'\r\n\tand c_nationkey = n_nationkey\r\ngroup by\r\n\tc_custkey,\r\n\tc_name,\r\n\tc_acctbal,\r\n\tc_phone,\r\n\tn_name,\r\n\tc_address,\r\n\tc_comment\r\norder by\r\n\trevenue desc;\r;\n\nPRAGMA profile_output='./query-log/tpch-sf1/tpch/hausberg-1-threads/duckdb-20250306-15-10-11/hot/10.json';\nselect\r\n\tc_custkey,\r\n\tc_name,\r\n\tsum(l_extendedprice * (1 - l_discount)) as revenue,\r\n\tc_acctbal,\r\n\tn_name,\r\n\tc_address,\r\n\tc_phone,\r\n\tc_comment\r\nfrom\r\n\tcustomer,\r\n\torders,\r\n\tlineitem,\r\n\tnation\r\nwhere\r\n\tc_custkey = o_custkey\r\n\tand l_orderkey = o_orderkey\r\n\tand o_orderdate >= date ':1'\r\n\tand o_orderdate < date ':1' + interval '3' month\r\n\tand l_returnflag = 'R'\r\n\tand c_nationkey = n_nationkey\r\ngroup by\r\n\tc_custkey,\r\n\tc_name,\r\n\tc_acctbal,\r\n\tc_phone,\r\n\tn_name,\r\n\tc_address,\r\n\tc_comment\r\norder by\r\n\trevenue desc;\r;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000000,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "ORDER_BY",
+         "timing":0.000000,
+         "cardinality":0,
+         "extra_info": "ORDERS:\nsum((lineitem.l_extendedprice * (1 - lineitem.l_discount))) DESC",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "PROJECTION",
+            "timing":0.000000,
+            "cardinality":0,
+            "extra_info": "c_custkey\nc_name\nrevenue\nc_acctbal\nn_name\nc_address\nc_phone\nc_comment\n",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "HASH_GROUP_BY",
+               "timing":0.000001,
+               "cardinality":0,
+               "extra_info": "#0\n#1\n#2\n#3\n#4\n#5\n#6\nsum(#7)",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "PROJECTION",
+                  "timing":0.000000,
+                  "cardinality":0,
+                  "extra_info": "c_custkey\nc_name\nc_acctbal\nc_phone\nn_name\nc_address\nc_comment\n(l_extendedprice * (1.00 - l_discount))\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "EMPTY_RESULT",
+                     "timing":0.000000,
+                     "cardinality":0,
+                     "extra_info": "",
+                     "timings": [
+                     ],
+                     "children": [
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

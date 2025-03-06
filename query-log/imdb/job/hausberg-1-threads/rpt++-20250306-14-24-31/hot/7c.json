@@ -1,0 +1,379 @@
+{
+   "name":  "Query", 
+   "result": 0.995709,
+   "timing": 0.995709,
+   "cardinality": 0,
+   "extra-info": "SELECT min(n.name) AS cast_member_name,\n       min(pi.info) AS cast_member_info\nFROM aka_name AS an,\n     cast_info AS ci,\n     info_type AS it,\n     link_type AS lt,\n     movie_link AS ml,\n     name AS n,\n     person_info AS pi,\n     title AS t\nWHERE an.name IS NOT NULL\n  AND (an.name LIKE '%a%'\n       OR an.name LIKE 'A%')\n  AND it.info ='mini biography'\n  AND lt.link in ('references',\n                  'referenced in',\n                  'features',\n                  'featured in')\n  AND n.name_pcode_cf BETWEEN 'A' AND 'F'\n  AND (n.gender='m'\n       OR (n.gender = 'f'\n           AND n.name LIKE 'A%'))\n  AND pi.note IS NOT NULL\n  AND t.production_year BETWEEN 1980 AND 2010\n  AND n.id = an.person_id\n  AND n.id = pi.person_id\n  AND ci.person_id = n.id\n  AND t.id = ci.movie_id\n  AND ml.linked_movie_id = t.id\n  AND lt.id = ml.link_type_id\n  AND it.id = pi.info_type_id\n  AND pi.person_id = an.person_id\n  AND pi.person_id = ci.person_id\n  AND an.person_id = ci.person_id\n  AND ci.movie_id = ml.linked_movie_id;;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000002,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "UNGROUPED_AGGREGATE",
+         "timing":0.000493,
+         "cardinality":1,
+         "extra_info": "min(#0)\nmin(#1)",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "PROJECTION",
+            "timing":0.000014,
+            "cardinality":68185,
+            "extra_info": "name\ninfo\n",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "HASH_JOIN",
+               "timing":0.129711,
+               "cardinality":68185,
+               "extra_info": "INNER\nid = link_type_id\n\n[INFOSEPARATOR]\nEC: 0\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "CREATE_BF",
+                  "timing":0.000019,
+                  "cardinality":4,
+                  "extra_info": "",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "FILTER",
+                     "timing":0.000009,
+                     "cardinality":4,
+                     "extra_info": "((link = 'references') OR (link = 'referenced in') OR (link = 'features') OR (link = 'featured in'))\n[INFOSEPARATOR]\nEC: 3",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "SEQ_SCAN ",
+                        "timing":0.000003,
+                        "cardinality":18,
+                        "extra_info": "link_type\n[INFOSEPARATOR]\nlink\nid\n[INFOSEPARATOR]\nEC: 3",
+                        "timings": [
+                        ],
+                        "children": [
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+,
+                {
+                  "name": "HASH_JOIN",
+                  "timing":0.099464,
+                  "cardinality":68185,
+                  "extra_info": "INNER\nid = linked_movie_id\n\n[INFOSEPARATOR]\nEC: 0\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "CREATE_BF",
+                     "timing":0.000184,
+                     "cardinality":12621,
+                     "extra_info": "",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "USE_BF",
+                        "timing":0.009249,
+                        "cardinality":12621,
+                        "extra_info": "",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "SEQ_SCAN ",
+                           "timing":0.017481,
+                           "cardinality":1555597,
+                           "extra_info": "title\n[INFOSEPARATOR]\nid\n[INFOSEPARATOR]\nFilters: production_year>=1980 AND production_year<=2010 AND production_year IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 505662",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+,
+                   {
+                     "name": "HASH_JOIN",
+                     "timing":0.029142,
+                     "cardinality":75073,
+                     "extra_info": "INNER\nlinked_movie_id = movie_id\n\n[INFOSEPARATOR]\nEC: 0\n",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "CREATE_BF",
+                        "timing":0.000502,
+                        "cardinality":21505,
+                        "extra_info": "",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "USE_BF",
+                           "timing":0.000222,
+                           "cardinality":21505,
+                           "extra_info": "",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "SEQ_SCAN ",
+                              "timing":0.000072,
+                              "cardinality":29997,
+                              "extra_info": "movie_link\n[INFOSEPARATOR]\nlinked_movie_id\nlink_type_id\n[INFOSEPARATOR]\nEC: 29997",
+                              "timings": [
+                              ],
+                              "children": [
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+,
+                      {
+                        "name": "HASH_JOIN",
+                        "timing":0.009031,
+                        "cardinality":48218,
+                        "extra_info": "INNER\nperson_id = person_id\n\n[INFOSEPARATOR]\nEC: 81\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "USE_BF",
+                           "timing":0.008292,
+                           "cardinality":33210,
+                           "extra_info": "",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "USE_BF",
+                              "timing":0.202028,
+                              "cardinality":886774,
+                              "extra_info": "",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "SEQ_SCAN ",
+                                 "timing":0.077983,
+                                 "cardinality":36244344,
+                                 "extra_info": "cast_info\n[INFOSEPARATOR]\nperson_id\nmovie_id\n[INFOSEPARATOR]\nEC: 36244344",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+,
+                         {
+                           "name": "HASH_JOIN",
+                           "timing":0.012684,
+                           "cardinality":12595,
+                           "extra_info": "INNER\nperson_id = id\n\n[INFOSEPARATOR]\nEC: 9\n",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "CREATE_BF",
+                              "timing":0.054851,
+                              "cardinality":686095,
+                              "extra_info": "",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "FILTER",
+                                 "timing":0.016346,
+                                 "cardinality":686095,
+                                 "extra_info": "((name IS NOT NULL) AND (contains(name, 'a') OR prefix(name, 'A')))\n[INFOSEPARATOR]\nEC: 180268",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "SEQ_SCAN ",
+                                    "timing":0.038066,
+                                    "cardinality":901343,
+                                    "extra_info": "aka_name\n[INFOSEPARATOR]\nname\nperson_id\n[INFOSEPARATOR]\nEC: 180268",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+,
+                            {
+                              "name": "HASH_JOIN",
+                              "timing":0.010677,
+                              "cardinality":6765,
+                              "extra_info": "INNER\nid = person_id\n\n[INFOSEPARATOR]\nEC: 213\n",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "CREATE_BF",
+                                 "timing":0.001143,
+                                 "cardinality":11205,
+                                 "extra_info": "",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "USE_BF",
+                                    "timing":0.003384,
+                                    "cardinality":11205,
+                                    "extra_info": "",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "FILTER",
+                                       "timing":0.005431,
+                                       "cardinality":507621,
+                                       "extra_info": "((gender = 'm') OR ((gender = 'f') AND prefix(name, 'A')))\n[INFOSEPARATOR]\nEC: 166699",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                        {
+                                          "name": "SEQ_SCAN ",
+                                          "timing":0.076892,
+                                          "cardinality":1103278,
+                                          "extra_info": "name\n[INFOSEPARATOR]\ngender\nname\nid\n[INFOSEPARATOR]\nFilters: name_pcode_cf>=A AND name_pcode_cf<=F AND name_pcode_cf IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 166699",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                          ]
+                                        }
+                                       ]
+                                     }
+                                    ]
+                                  }
+                                 ]
+                               }
+,
+                               {
+                                 "name": "HASH_JOIN",
+                                 "timing":0.000687,
+                                 "cardinality":39819,
+                                 "extra_info": "INNER\ninfo_type_id = id\n\n[INFOSEPARATOR]\nEC: 5292\n",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "CREATE_BF",
+                                    "timing":0.028056,
+                                    "cardinality":39819,
+                                    "extra_info": "",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "USE_BF",
+                                       "timing":0.004785,
+                                       "cardinality":39819,
+                                       "extra_info": "",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                        {
+                                          "name": "USE_BF",
+                                          "timing":0.001370,
+                                          "cardinality":84183,
+                                          "extra_info": "",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                           {
+                                             "name": "FILTER",
+                                             "timing":0.018949,
+                                             "cardinality":84183,
+                                             "extra_info": "(note IS NOT NULL)\n[INFOSEPARATOR]\nEC: 592732",
+                                             "timings": [
+                                             ],
+                                             "children": [
+                                              {
+                                                "name": "SEQ_SCAN ",
+                                                "timing":0.121826,
+                                                "cardinality":2963664,
+                                                "extra_info": "person_info\n[INFOSEPARATOR]\nnote\nperson_id\ninfo_type_id\ninfo\n[INFOSEPARATOR]\nEC: 592732",
+                                                "timings": [
+                                                ],
+                                                "children": [
+                                                ]
+                                              }
+                                             ]
+                                           }
+                                          ]
+                                        }
+                                       ]
+                                     }
+                                    ]
+                                  }
+,
+                                  {
+                                    "name": "CREATE_BF",
+                                    "timing":0.000026,
+                                    "cardinality":1,
+                                    "extra_info": "",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "SEQ_SCAN ",
+                                       "timing":0.000014,
+                                       "cardinality":1,
+                                       "extra_info": "info_type\n[INFOSEPARATOR]\nid\n[INFOSEPARATOR]\nFilters: info=mini biography AND info IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 1",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                       ]
+                                     }
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

@@ -1,0 +1,247 @@
+{
+   "name":  "Query", 
+   "result": 0.012016,
+   "timing": 0.012016,
+   "cardinality": 0,
+   "extra-info": "select\r\n        ps_partkey,\r\n        sum(ps_supplycost * ps_availqty) as value\r\nfrom\r\n        partsupp,\r\n        supplier,\r\n        nation\r\nwhere\r\n        ps_suppkey = s_suppkey\r\n        and s_nationkey = n_nationkey\r\n        and n_name = 'GERMANY'\r\ngroup by\r\n        ps_partkey having\r\n                sum(ps_supplycost * ps_availqty) > (\r\n                        select\r\n                                sum(ps_supplycost * ps_availqty) * 0.0001\r\n                        from\r\n                                partsupp,\r\n                                supplier,\r\n                                nation\r\n                        where\r\n                                ps_suppkey = s_suppkey\r\n                                and s_nationkey = n_nationkey\r\n                                and n_name = 'GERMANY'\r\n                )\r\norder by\r\n        value desc;;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000002,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "ORDER_BY",
+         "timing":0.000086,
+         "cardinality":1048,
+         "extra_info": "ORDERS:\nsum((partsupp.ps_supplycost * partsupp.ps_availqty)) DESC",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "PROJECTION",
+            "timing":0.000002,
+            "cardinality":1048,
+            "extra_info": "ps_partkey\nvalue\n",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "NESTED_LOOP_JOIN",
+               "timing":0.000434,
+               "cardinality":1048,
+               "extra_info": "INNER\nCAST(sum((ps_supplycost * CAST(ps_availqty AS DECIMAL(18,0)))) AS DECIMAL(38,6)) > SUBQUERY\n\n[INFOSEPARATOR]\nEC: 55623153\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "HASH_GROUP_BY",
+                  "timing":0.001959,
+                  "cardinality":29818,
+                  "extra_info": "#0\nsum(#1)",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "PROJECTION",
+                     "timing":0.000337,
+                     "cardinality":31680,
+                     "extra_info": "ps_partkey\n(ps_supplycost * CAST(ps_availqty AS DECIMAL(18,0)))\n",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "PROJECTION",
+                        "timing":0.000435,
+                        "cardinality":31680,
+                        "extra_info": "__internal_compress_integral_usmallint(#0, 1)\n#1\n#2\n#3\n__internal_compress_integral_usmallint(#4, 1)\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "HASH_JOIN",
+                           "timing":0.001432,
+                           "cardinality":31680,
+                           "extra_info": "INNER\nps_suppkey = s_suppkey\n\n[INFOSEPARATOR]\nEC: 27811\n",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "SEQ_SCAN ",
+                              "timing":0.002434,
+                              "cardinality":800000,
+                              "extra_info": "partsupp\n[INFOSEPARATOR]\nps_suppkey\nps_partkey\nps_supplycost\nps_availqty\n[INFOSEPARATOR]\nEC: 800000",
+                              "timings": [
+                              ],
+                              "children": [
+                              ]
+                            }
+,
+                            {
+                              "name": "HASH_JOIN",
+                              "timing":0.000021,
+                              "cardinality":396,
+                              "extra_info": "INNER\ns_nationkey = n_nationkey\n\n[INFOSEPARATOR]\nEC: 400\n",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "SEQ_SCAN ",
+                                 "timing":0.000015,
+                                 "cardinality":10000,
+                                 "extra_info": "supplier\n[INFOSEPARATOR]\ns_suppkey\ns_nationkey\n[INFOSEPARATOR]\nEC: 10000",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                 ]
+                               }
+,
+                               {
+                                 "name": "SEQ_SCAN ",
+                                 "timing":0.000004,
+                                 "cardinality":1,
+                                 "extra_info": "nation\n[INFOSEPARATOR]\nn_nationkey\n[INFOSEPARATOR]\nFilters: n_name=GERMANY AND n_name IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 1",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+,
+                {
+                  "name": "UNGROUPED_AGGREGATE",
+                  "timing":0.000001,
+                  "cardinality":1,
+                  "extra_info": "first(#0)",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "PROJECTION",
+                     "timing":0.000000,
+                     "cardinality":1,
+                     "extra_info": "#0\n",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "STREAMING_LIMIT",
+                        "timing":0.000000,
+                        "cardinality":1,
+                        "extra_info": "",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "PROJECTION",
+                           "timing":0.000002,
+                           "cardinality":1,
+                           "extra_info": "(sum((ps_supplycost * CAST(ps_availqty AS DECIMAL(18,0)))) * 0.0001)\n",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "UNGROUPED_AGGREGATE",
+                              "timing":0.000084,
+                              "cardinality":1,
+                              "extra_info": "sum(#0)",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "PROJECTION",
+                                 "timing":0.000351,
+                                 "cardinality":31680,
+                                 "extra_info": "(ps_supplycost * CAST(ps_availqty AS DECIMAL(18,0)))\n",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "HASH_JOIN",
+                                    "timing":0.001407,
+                                    "cardinality":31680,
+                                    "extra_info": "INNER\nps_suppkey = s_suppkey\n\n[INFOSEPARATOR]\nEC: 27811\n",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "SEQ_SCAN ",
+                                       "timing":0.001754,
+                                       "cardinality":800000,
+                                       "extra_info": "partsupp\n[INFOSEPARATOR]\nps_suppkey\nps_supplycost\nps_availqty\n[INFOSEPARATOR]\nEC: 800000",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                       ]
+                                     }
+,
+                                     {
+                                       "name": "HASH_JOIN",
+                                       "timing":0.000031,
+                                       "cardinality":396,
+                                       "extra_info": "INNER\ns_nationkey = n_nationkey\n\n[INFOSEPARATOR]\nEC: 400\n",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                        {
+                                          "name": "SEQ_SCAN ",
+                                          "timing":0.000017,
+                                          "cardinality":10000,
+                                          "extra_info": "supplier\n[INFOSEPARATOR]\ns_suppkey\ns_nationkey\n[INFOSEPARATOR]\nEC: 10000",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                          ]
+                                        }
+,
+                                        {
+                                          "name": "SEQ_SCAN ",
+                                          "timing":0.000017,
+                                          "cardinality":1,
+                                          "extra_info": "nation\n[INFOSEPARATOR]\nn_nationkey\n[INFOSEPARATOR]\nFilters: n_name=GERMANY AND n_name IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 1",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                          ]
+                                        }
+                                       ]
+                                     }
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

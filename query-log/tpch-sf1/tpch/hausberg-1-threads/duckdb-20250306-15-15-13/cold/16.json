@@ -1,0 +1,215 @@
+{
+   "name":  "Query", 
+   "result": 0.071625,
+   "timing": 0.071625,
+   "cardinality": 0,
+   "extra-info": "-- PRAGMA profiling_mode = 'detailed';\n;\nselect\r\n        p_brand,\r\n        p_type,\r\n        p_size,\r\n        count(distinct ps_suppkey) as supplier_cnt\r\nfrom\r\n        partsupp,\r\n        part\r\nwhere\r\n        p_partkey = ps_partkey\r\n        and p_brand <> 'Brand#45'\r\n        and p_type not like 'MEDIUM POLISHED%'\r\n        and p_size in (49, 14, 23, 45, 19, 3, 36, 9)\r\n        and ps_suppkey not in (\r\n                select\r\n                        s_suppkey\r\n                from\r\n                        supplier\r\n                where\r\n                        s_comment like '%Customer%Complaints%'\r\n        )\r\ngroup by\r\n        p_brand,\r\n        p_type,\r\n        p_size\r\norder by\r\n        supplier_cnt desc,\r\n        p_brand,\r\n        p_type,\r\n        p_size;;\n\nPRAGMA profile_output='./query-log/tpch-sf1/tpch/hausberg-1-threads/duckdb-20250306-15-15-13/hot/16.json';\nselect\r\n        p_brand,\r\n        p_type,\r\n        p_size,\r\n        count(distinct ps_suppkey) as supplier_cnt\r\nfrom\r\n        partsupp,\r\n        part\r\nwhere\r\n        p_partkey = ps_partkey\r\n        and p_brand <> 'Brand#45'\r\n        and p_type not like 'MEDIUM POLISHED%'\r\n        and p_size in (49, 14, 23, 45, 19, 3, 36, 9)\r\n        and ps_suppkey not in (\r\n                select\r\n                        s_suppkey\r\n                from\r\n                        supplier\r\n                where\r\n                        s_comment like '%Customer%Complaints%'\r\n        )\r\ngroup by\r\n        p_brand,\r\n        p_type,\r\n        p_size\r\norder by\r\n        supplier_cnt desc,\r\n        p_brand,\r\n        p_type,\r\n        p_size;;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000672,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "PROJECTION",
+         "timing":0.000168,
+         "cardinality":18314,
+         "extra_info": "__internal_decompress_string(#0)\n#1\n__internal_decompress_integral_integer(#2, 1)\n#3\n",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "ORDER_BY",
+            "timing":0.001694,
+            "cardinality":18314,
+            "extra_info": "ORDERS:\ncount(DISTINCT partsupp.ps_suppkey) DESC\npart.p_brand ASC\npart.p_type ASC\npart.p_size ASC",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "PROJECTION",
+               "timing":0.000179,
+               "cardinality":18314,
+               "extra_info": "__internal_compress_string_hugeint(#0)\n#1\n__internal_compress_integral_utinyint(#2, 1)\n#3\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "PROJECTION",
+                  "timing":0.000177,
+                  "cardinality":18314,
+                  "extra_info": "__internal_decompress_string(#0)\n#1\n__internal_decompress_integral_integer(#2, 1)\n#3\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "HASH_GROUP_BY",
+                     "timing":0.015624,
+                     "cardinality":18314,
+                     "extra_info": "#0\n#1\n#2\ncount(DISTINCT #3)",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "PROJECTION",
+                        "timing":0.000080,
+                        "cardinality":118274,
+                        "extra_info": "p_brand\np_type\np_size\nps_suppkey\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "PROJECTION",
+                           "timing":0.001765,
+                           "cardinality":118274,
+                           "extra_info": "#0\n__internal_compress_string_hugeint(#1)\n#2\n__internal_compress_integral_utinyint(#3, 1)\n#4\n",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "PROJECTION",
+                              "timing":0.000116,
+                              "cardinality":118274,
+                              "extra_info": "#1\n#3\n#4\n#5\n#6\n",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "FILTER",
+                                 "timing":0.000434,
+                                 "cardinality":118274,
+                                 "extra_info": "(NOT SUBQUERY)\n[INFOSEPARATOR]\nEC: 168893",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "HASH_JOIN",
+                                    "timing":0.001390,
+                                    "cardinality":118324,
+                                    "extra_info": "MARK\nps_suppkey = #0\n\n[INFOSEPARATOR]\nEC: 168893\n",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "HASH_JOIN",
+                                       "timing":0.004363,
+                                       "cardinality":118324,
+                                       "extra_info": "INNER\nps_partkey = p_partkey\n\n[INFOSEPARATOR]\nEC: 168893\n",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                        {
+                                          "name": "SEQ_SCAN ",
+                                          "timing":0.010569,
+                                          "cardinality":800000,
+                                          "extra_info": "partsupp\n[INFOSEPARATOR]\nps_partkey\nps_suppkey\n[INFOSEPARATOR]\nEC: 800000",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                          ]
+                                        }
+,
+                                        {
+                                          "name": "FILTER",
+                                          "timing":0.001715,
+                                          "cardinality":29581,
+                                          "extra_info": "(IN (...) AND (p_brand != 'Brand#45') AND (NOT prefix(p_type, 'MEDIUM POLISHED')))\n[INFOSEPARATOR]\nEC: 40000",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                           {
+                                             "name": "HASH_JOIN",
+                                             "timing":0.001617,
+                                             "cardinality":200000,
+                                             "extra_info": "MARK\np_size = #0\n\n[INFOSEPARATOR]\nEC: 200000\n",
+                                             "timings": [
+                                             ],
+                                             "children": [
+                                              {
+                                                "name": "SEQ_SCAN ",
+                                                "timing":0.006122,
+                                                "cardinality":200000,
+                                                "extra_info": "part\n[INFOSEPARATOR]\np_partkey\np_brand\np_type\np_size\n[INFOSEPARATOR]\nEC: 200000",
+                                                "timings": [
+                                                ],
+                                                "children": [
+                                                ]
+                                              }
+,
+                                              {
+                                                "name": "COLUMN_DATA_SCAN",
+                                                "timing":0.000002,
+                                                "cardinality":8,
+                                                "extra_info": "",
+                                                "timings": [
+                                                ],
+                                                "children": [
+                                                ]
+                                              }
+                                             ]
+                                           }
+                                          ]
+                                        }
+                                       ]
+                                     }
+,
+                                     {
+                                       "name": "PROJECTION",
+                                       "timing":0.000001,
+                                       "cardinality":4,
+                                       "extra_info": "s_suppkey\n",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                        {
+                                          "name": "FILTER",
+                                          "timing":0.000306,
+                                          "cardinality":4,
+                                          "extra_info": "(s_comment ~~ '%Customer%Complaints%')\n[INFOSEPARATOR]\nEC: 10000",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                           {
+                                             "name": "SEQ_SCAN ",
+                                             "timing":0.003398,
+                                             "cardinality":10000,
+                                             "extra_info": "supplier\n[INFOSEPARATOR]\ns_comment\ns_suppkey\n[INFOSEPARATOR]\nEC: 10000",
+                                             "timings": [
+                                             ],
+                                             "children": [
+                                             ]
+                                           }
+                                          ]
+                                        }
+                                       ]
+                                     }
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

@@ -1,0 +1,156 @@
+{
+   "name":  "Query", 
+   "result": 0.678233,
+   "timing": 0.678233,
+   "cardinality": 0,
+   "extra-info": "SELECT min(k.keyword) AS movie_keyword,\n       min(n.name) AS actor_name,\n       min(t.title) AS marvel_movie\nFROM cast_info AS ci,\n     keyword AS k,\n     movie_keyword AS mk,\n     name AS n,\n     title AS t\nWHERE k.keyword = 'marvel-cinematic-universe'\n  AND n.name LIKE '%Downey%Robert%'\n  AND t.production_year > 2010\n  AND k.id = mk.keyword_id\n  AND t.id = mk.movie_id\n  AND t.id = ci.movie_id\n  AND ci.movie_id = mk.movie_id\n  AND n.id = ci.person_id;;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000004,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "UNGROUPED_AGGREGATE",
+         "timing":0.000006,
+         "cardinality":1,
+         "extra_info": "min(#0)\nmin(#1)\nmin(#2)",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "PROJECTION",
+            "timing":0.000001,
+            "cardinality":6,
+            "extra_info": "keyword\nname\ntitle\n",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "HASH_JOIN",
+               "timing":0.000241,
+               "cardinality":6,
+               "extra_info": "INNER\nid = person_id\n\n[INFOSEPARATOR]\nEC: 24\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "FILTER",
+                  "timing":0.057208,
+                  "cardinality":2,
+                  "extra_info": "(name ~~ '%Downey%Robert%')\n[INFOSEPARATOR]\nEC: 833498",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "SEQ_SCAN ",
+                     "timing":0.148898,
+                     "cardinality":4061926,
+                     "extra_info": "name\n[INFOSEPARATOR]\nname\nid\n[INFOSEPARATOR]\nFilters: id<=4061926 AND id IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 833498",
+                     "timings": [
+                     ],
+                     "children": [
+                     ]
+                   }
+                  ]
+                }
+,
+                {
+                  "name": "HASH_JOIN",
+                  "timing":0.215758,
+                  "cardinality":1224,
+                  "extra_info": "INNER\nmovie_id = movie_id\nmovie_id = id\n\n[INFOSEPARATOR]\nEC: 123\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "SEQ_SCAN ",
+                     "timing":0.116518,
+                     "cardinality":36244327,
+                     "extra_info": "cast_info\n[INFOSEPARATOR]\nmovie_id\nperson_id\n[INFOSEPARATOR]\nFilters: movie_id>=2 AND movie_id<=2525971 AND movie_id IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 36244344",
+                     "timings": [
+                     ],
+                     "children": [
+                     ]
+                   }
+,
+                   {
+                     "name": "HASH_JOIN",
+                     "timing":0.003077,
+                     "cardinality":11,
+                     "extra_info": "INNER\nid = movie_id\n\n[INFOSEPARATOR]\nEC: 10\n",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "FILTER",
+                        "timing":0.001764,
+                        "cardinality":391549,
+                        "extra_info": "(id BETWEEN 2 AND 2525971)\n[INFOSEPARATOR]\nEC: 505662",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "SEQ_SCAN ",
+                           "timing":0.102704,
+                           "cardinality":391666,
+                           "extra_info": "title\n[INFOSEPARATOR]\nid\ntitle\n[INFOSEPARATOR]\nFilters: production_year>2010 AND production_year IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 505662",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+                        ]
+                      }
+,
+                      {
+                        "name": "HASH_JOIN",
+                        "timing":0.006066,
+                        "cardinality":14,
+                        "extra_info": "INNER\nkeyword_id = id\n\n[INFOSEPARATOR]\nEC: 68\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "SEQ_SCAN ",
+                           "timing":0.011056,
+                           "cardinality":4523930,
+                           "extra_info": "movie_keyword\n[INFOSEPARATOR]\nkeyword_id\nmovie_id\n[INFOSEPARATOR]\nEC: 4523930",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+,
+                         {
+                           "name": "SEQ_SCAN ",
+                           "timing":0.004903,
+                           "cardinality":1,
+                           "extra_info": "keyword\n[INFOSEPARATOR]\nkeyword\nid\n[INFOSEPARATOR]\nFilters: keyword=marvel-cinematic-universe AND keyword IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 2",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

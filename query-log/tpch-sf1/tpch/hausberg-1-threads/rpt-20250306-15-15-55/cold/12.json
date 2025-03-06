@@ -1,0 +1,113 @@
+{
+   "name":  "Query", 
+   "result": 0.355183,
+   "timing": 0.355183,
+   "cardinality": 0,
+   "extra-info": "-- PRAGMA profiling_mode = 'detailed';\n;\nselect\r\n        l_shipmode,\r\n        sum(case\r\n                when o_orderpriority = '1-URGENT'\r\n                        or o_orderpriority = '2-HIGH'\r\n                        then 1\r\n                else 0\r\n        end) as high_line_count,\r\n        sum(case\r\n                when o_orderpriority <> '1-URGENT'\r\n                        and o_orderpriority <> '2-HIGH'\r\n                        then 1\r\n                else 0\r\n        end) as low_line_count\r\nfrom\r\n        orders,\r\n        lineitem\r\nwhere\r\n        o_orderkey = l_orderkey\r\n        and l_shipmode in ('MAIL', 'SHIP')\r\n        and l_commitdate < l_receiptdate\r\n        and l_shipdate < l_commitdate\r\n        and l_receiptdate >= date '1994-01-01'\r\n        and l_receiptdate < date '1994-01-01' + interval '1' year\r\ngroup by\r\n        l_shipmode\r\norder by\r\n        l_shipmode;;\n\nPRAGMA profile_output='./query-log/tpch-sf1/tpch/hausberg-1-threads/rpt-20250306-15-15-55/hot/12.json';\nselect\r\n        l_shipmode,\r\n        sum(case\r\n                when o_orderpriority = '1-URGENT'\r\n                        or o_orderpriority = '2-HIGH'\r\n                        then 1\r\n                else 0\r\n        end) as high_line_count,\r\n        sum(case\r\n                when o_orderpriority <> '1-URGENT'\r\n                        and o_orderpriority <> '2-HIGH'\r\n                        then 1\r\n                else 0\r\n        end) as low_line_count\r\nfrom\r\n        orders,\r\n        lineitem\r\nwhere\r\n        o_orderkey = l_orderkey\r\n        and l_shipmode in ('MAIL', 'SHIP')\r\n        and l_commitdate < l_receiptdate\r\n        and l_shipdate < l_commitdate\r\n        and l_receiptdate >= date '1994-01-01'\r\n        and l_receiptdate < date '1994-01-01' + interval '1' year\r\ngroup by\r\n        l_shipmode\r\norder by\r\n        l_shipmode;;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000003,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "ORDER_BY",
+         "timing":0.000116,
+         "cardinality":2,
+         "extra_info": "ORDERS:\nlineitem.l_shipmode ASC",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "HASH_GROUP_BY",
+            "timing":0.002589,
+            "cardinality":2,
+            "extra_info": "#0\nsum(#1)\nsum(#2)",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "PROJECTION",
+               "timing":0.000765,
+               "cardinality":30988,
+               "extra_info": "l_shipmode\nCASE  WHEN (((o_orderpriority = '1-URGENT') OR (o_orderpriority = '2-HIGH'))) THEN (1) ELSE 0 END\nCASE  WHEN (((o_orderpriority != '1-URGENT') AND (o_orderpriority != '2-HIGH'))) THEN (1) ELSE 0 END\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "HASH_JOIN",
+                  "timing":0.008211,
+                  "cardinality":30988,
+                  "extra_info": "INNER\no_orderkey = l_orderkey\n\n[INFOSEPARATOR]\nEC: 240048\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "USE_BF",
+                     "timing":0.009451,
+                     "cardinality":69736,
+                     "extra_info": "",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "SEQ_SCAN ",
+                        "timing":0.033135,
+                        "cardinality":1500000,
+                        "extra_info": "orders\n[INFOSEPARATOR]\no_orderkey\no_orderpriority\n[INFOSEPARATOR]\nEC: 1500000",
+                        "timings": [
+                        ],
+                        "children": [
+                        ]
+                      }
+                     ]
+                   }
+,
+                   {
+                     "name": "CREATE_BF",
+                     "timing":0.004279,
+                     "cardinality":30988,
+                     "extra_info": "",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "FILTER",
+                        "timing":0.021460,
+                        "cardinality":30988,
+                        "extra_info": "((l_commitdate < l_receiptdate) AND (l_shipdate < l_commitdate) AND ((l_shipmode = 'MAIL') OR (l_shipmode = 'SHIP')))\n[INFOSEPARATOR]\nEC: 240048",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "SEQ_SCAN ",
+                           "timing":0.269807,
+                           "cardinality":885773,
+                           "extra_info": "lineitem\n[INFOSEPARATOR]\nl_orderkey\nl_shipmode\nl_commitdate\nl_receiptdate\nl_shipdate\n[INFOSEPARATOR]\nFilters: l_receiptdate>=1994-01-01 AND l_receiptdate<1995-01-01 AND l_receiptdate IS NOT NULL\nl_commitdate<1995-01-01 AND l_commitdate IS NOT NULL\nl_shipdate<1995-01-01 AND l_shipdate IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 240048",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

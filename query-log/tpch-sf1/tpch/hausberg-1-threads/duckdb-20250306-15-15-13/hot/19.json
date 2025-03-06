@@ -1,0 +1,113 @@
+{
+   "name":  "Query", 
+   "result": 0.214085,
+   "timing": 0.214085,
+   "cardinality": 0,
+   "extra-info": "select\r\n        sum(l_extendedprice* (1 - l_discount)) as revenue\r\nfrom\r\n        lineitem,\r\n        part\r\nwhere\r\n        (\r\n                p_partkey = l_partkey\r\n                and p_brand = 'Brand#12'\r\n                and p_container in ('SM CASE', 'SM BOX', 'SM PACK', 'SM PKG')\r\n                and l_quantity >= 1 and l_quantity <= 1 + 10\r\n                and p_size between 1 and 5\r\n                and l_shipmode in ('AIR', 'AIR REG')\r\n                and l_shipinstruct = 'DELIVER IN PERSON'\r\n        )\r\n        or\r\n        (\r\n                p_partkey = l_partkey\r\n                and p_brand = 'Brand#23'\r\n                and p_container in ('MED BAG', 'MED BOX', 'MED PKG', 'MED PACK')\r\n                and l_quantity >= 10 and l_quantity <= 10 + 10\r\n                and p_size between 1 and 10\r\n                and l_shipmode in ('AIR', 'AIR REG')\r\n                and l_shipinstruct = 'DELIVER IN PERSON'\r\n        )\r\n        or\r\n        (\r\n                p_partkey = l_partkey\r\n                and p_brand = 'Brand#34'\r\n                and p_container in ('LG CASE', 'LG BOX', 'LG PACK', 'LG PKG')\r\n                and l_quantity >= 20 and l_quantity <= 20 + 10\r\n                and p_size between 1 and 15\r\n                and l_shipmode in ('AIR', 'AIR REG')\r\n                and l_shipinstruct = 'DELIVER IN PERSON'\r\n        );;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000001,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "UNGROUPED_AGGREGATE",
+         "timing":0.000009,
+         "cardinality":1,
+         "extra_info": "sum(#0)",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "PROJECTION",
+            "timing":0.000011,
+            "cardinality":121,
+            "extra_info": "(l_extendedprice * (1.00 - l_discount))\n",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "PROJECTION",
+               "timing":0.000000,
+               "cardinality":121,
+               "extra_info": "#1\n#2\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "PROJECTION",
+                  "timing":0.000002,
+                  "cardinality":121,
+                  "extra_info": "#1\n#3\n#4\n#6\n#7\n#8\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "FILTER",
+                     "timing":0.026727,
+                     "cardinality":121,
+                     "extra_info": "(((l_quantity <= 11.00) AND (p_size <= 5) AND (p_brand = 'Brand#12') AND ((p_container = 'SM CASE') OR (p_container = 'SM BOX') OR (p_container = 'SM PACK') OR (p_container = 'SM PKG'))) OR ((l_quantity >= 10.00) AND (l_quantity <= 20.00) AND (p_size <= 10) AND (p_brand = 'Brand#23') AND ((p_container = 'MED BAG') OR (p_container = 'MED BOX') OR (p_container = 'MED PKG') OR (p_container = 'MED PACK'))) OR ((l_quantity >= 20.00) AND (l_quantity <= 30.00) AND (p_size <= 15) AND (p_brand = 'Brand#34') AND ((p_container = 'LG CASE') OR (p_container = 'LG BOX') OR (p_container = 'LG PACK') OR (p_container = 'LG PKG'))))\n[INFOSEPARATOR]\nEC: 160351",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "HASH_JOIN",
+                        "timing":0.008494,
+                        "cardinality":214377,
+                        "extra_info": "INNER\nl_partkey = p_partkey\n\n[INFOSEPARATOR]\nEC: 160351\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "FILTER",
+                           "timing":0.015429,
+                           "cardinality":214377,
+                           "extra_info": "((l_shipmode = 'AIR') OR (l_shipmode = 'AIR REG'))\n[INFOSEPARATOR]\nEC: 300060",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "SEQ_SCAN ",
+                              "timing":0.143229,
+                              "cardinality":1500048,
+                              "extra_info": "lineitem\n[INFOSEPARATOR]\nl_partkey\nl_quantity\nl_shipmode\nl_extendedprice\nl_discount\n[INFOSEPARATOR]\nFilters: l_shipinstruct=DELIVER IN PERSON AND l_shipinstruct IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 300060",
+                              "timings": [
+                              ],
+                              "children": [
+                              ]
+                            }
+                           ]
+                         }
+,
+                         {
+                           "name": "SEQ_SCAN ",
+                           "timing":0.000488,
+                           "cardinality":200000,
+                           "extra_info": "part\n[INFOSEPARATOR]\np_partkey\np_brand\np_container\np_size\n[INFOSEPARATOR]\nEC: 200000",
+                           "timings": [
+                           ],
+                           "children": [
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}

@@ -1,0 +1,248 @@
+{
+   "name":  "Query", 
+   "result": 2.537646,
+   "timing": 2.537646,
+   "cardinality": 0,
+   "extra-info": "-- PRAGMA profiling_mode = 'detailed';\n;\nSELECT min(an.name) AS acress_pseudonym,\n       min(t.title) AS japanese_anime_movie\nFROM aka_name AS an,\n     cast_info AS ci,\n     company_name AS cn,\n     movie_companies AS mc,\n     name AS n,\n     role_type AS rt,\n     title AS t\nWHERE ci.note ='(voice: English version)'\n  AND cn.country_code ='[jp]'\n  AND mc.note like '%(Japan)%'\n  AND mc.note not like '%(USA)%'\n  AND (mc.note like '%(2006)%'\n       OR mc.note like '%(2007)%')\n  AND n.name like '%Yo%'\n  AND n.name not like '%Yu%'\n  AND rt.role ='actress'\n  AND t.production_year BETWEEN 2006 AND 2007\n  AND (t.title like 'One Piece%'\n       OR t.title like 'Dragon Ball Z%')\n  AND an.person_id = n.id\n  AND n.id = ci.person_id\n  AND ci.movie_id = t.id\n  AND t.id = mc.movie_id\n  AND mc.company_id = cn.id\n  AND ci.role_id = rt.id\n  AND an.person_id = ci.person_id\n  AND ci.movie_id = mc.movie_id;;\n\nPRAGMA profile_output='./query-log/imdb/job/hausberg-1-threads/duckdb-20250306-14-05-54/hot/8b.json';\nSELECT min(an.name) AS acress_pseudonym,\n       min(t.title) AS japanese_anime_movie\nFROM aka_name AS an,\n     cast_info AS ci,\n     company_name AS cn,\n     movie_companies AS mc,\n     name AS n,\n     role_type AS rt,\n     title AS t\nWHERE ci.note ='(voice: English version)'\n  AND cn.country_code ='[jp]'\n  AND mc.note like '%(Japan)%'\n  AND mc.note not like '%(USA)%'\n  AND (mc.note like '%(2006)%'\n       OR mc.note like '%(2007)%')\n  AND n.name like '%Yo%'\n  AND n.name not like '%Yu%'\n  AND rt.role ='actress'\n  AND t.production_year BETWEEN 2006 AND 2007\n  AND (t.title like 'One Piece%'\n       OR t.title like 'Dragon Ball Z%')\n  AND an.person_id = n.id\n  AND n.id = ci.person_id\n  AND ci.movie_id = t.id\n  AND t.id = mc.movie_id\n  AND mc.company_id = cn.id\n  AND ci.role_id = rt.id\n  AND an.person_id = ci.person_id\n  AND ci.movie_id = mc.movie_id;;\n", 
+   "timings": [
+
+   ],
+   "children": [
+    {
+      "name": "RESULT_COLLECTOR",
+      "timing":0.000028,
+      "cardinality":0,
+      "extra_info": "",
+      "timings": [
+      ],
+      "children": [
+       {
+         "name": "UNGROUPED_AGGREGATE",
+         "timing":0.000430,
+         "cardinality":1,
+         "extra_info": "min(#0)\nmin(#1)",
+         "timings": [
+         ],
+         "children": [
+          {
+            "name": "PROJECTION",
+            "timing":0.000001,
+            "cardinality":6,
+            "extra_info": "name\ntitle\n",
+            "timings": [
+            ],
+            "children": [
+             {
+               "name": "HASH_JOIN",
+               "timing":0.004364,
+               "cardinality":6,
+               "extra_info": "INNER\nperson_id = person_id\nperson_id = id\n\n[INFOSEPARATOR]\nEC: 0\n",
+               "timings": [
+               ],
+               "children": [
+                {
+                  "name": "SEQ_SCAN ",
+                  "timing":0.083425,
+                  "cardinality":772581,
+                  "extra_info": "aka_name\n[INFOSEPARATOR]\nperson_id\nname\n[INFOSEPARATOR]\nFilters: person_id<=4061926 AND person_id IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 901343",
+                  "timings": [
+                  ],
+                  "children": [
+                  ]
+                }
+,
+                {
+                  "name": "PROJECTION",
+                  "timing":0.000001,
+                  "cardinality":4,
+                  "extra_info": "#1\n#2\n",
+                  "timings": [
+                  ],
+                  "children": [
+                   {
+                     "name": "FILTER",
+                     "timing":0.000008,
+                     "cardinality":4,
+                     "extra_info": "(person_id >= 4)\n[INFOSEPARATOR]\nEC: 0",
+                     "timings": [
+                     ],
+                     "children": [
+                      {
+                        "name": "HASH_JOIN",
+                        "timing":0.000284,
+                        "cardinality":4,
+                        "extra_info": "INNER\nid = person_id\n\n[INFOSEPARATOR]\nEC: 0\n",
+                        "timings": [
+                        ],
+                        "children": [
+                         {
+                           "name": "FILTER",
+                           "timing":0.060744,
+                           "cardinality":20186,
+                           "extra_info": "(contains(name, 'Yo') AND (NOT contains(name, 'Yu')))\n[INFOSEPARATOR]\nEC: 833498",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "SEQ_SCAN ",
+                              "timing":0.324860,
+                              "cardinality":4061926,
+                              "extra_info": "name\n[INFOSEPARATOR]\nname\nid\n[INFOSEPARATOR]\nFilters: id<=4061926 AND id IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 833498",
+                              "timings": [
+                              ],
+                              "children": [
+                              ]
+                            }
+                           ]
+                         }
+,
+                         {
+                           "name": "HASH_JOIN",
+                           "timing":0.000261,
+                           "cardinality":25,
+                           "extra_info": "INNER\nid = company_id\n\n[INFOSEPARATOR]\nEC: 0\n",
+                           "timings": [
+                           ],
+                           "children": [
+                            {
+                              "name": "SEQ_SCAN ",
+                              "timing":0.005346,
+                              "cardinality":6752,
+                              "extra_info": "company_name\n[INFOSEPARATOR]\nid\n[INFOSEPARATOR]\nFilters: country_code=[jp] AND country_code IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 1478",
+                              "timings": [
+                              ],
+                              "children": [
+                              ]
+                            }
+,
+                            {
+                              "name": "HASH_JOIN",
+                              "timing":0.000741,
+                              "cardinality":25,
+                              "extra_info": "INNER\nmovie_id = id\nmovie_id = movie_id\n\n[INFOSEPARATOR]\nEC: 0\n",
+                              "timings": [
+                              ],
+                              "children": [
+                               {
+                                 "name": "FILTER",
+                                 "timing":0.053215,
+                                 "cardinality":8569,
+                                 "extra_info": "(contains(note, '(Japan)') AND (NOT contains(note, '(USA)')) AND (contains(note, '(2006)') OR contains(note, '(2007)')))\n[INFOSEPARATOR]\nEC: 521825",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "SEQ_SCAN ",
+                                    "timing":0.140349,
+                                    "cardinality":2609129,
+                                    "extra_info": "movie_companies\n[INFOSEPARATOR]\nnote\nmovie_id\ncompany_id\n[INFOSEPARATOR]\nEC: 521825",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                    ]
+                                  }
+                                 ]
+                               }
+,
+                               {
+                                 "name": "HASH_JOIN",
+                                 "timing":0.000101,
+                                 "cardinality":56,
+                                 "extra_info": "INNER\nrole_id = id\n\n[INFOSEPARATOR]\nEC: 101132\n",
+                                 "timings": [
+                                 ],
+                                 "children": [
+                                  {
+                                    "name": "HASH_JOIN",
+                                    "timing":0.005719,
+                                    "cardinality":226,
+                                    "extra_info": "INNER\nid = movie_id\n\n[INFOSEPARATOR]\nEC: 101132\n",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "FILTER",
+                                       "timing":0.008402,
+                                       "cardinality":7,
+                                       "extra_info": "((id BETWEEN 2 AND 2525745) AND (prefix(title, 'One Piece') OR prefix(title, 'Dragon Ball Z')))\n[INFOSEPARATOR]\nEC: 101132",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                        {
+                                          "name": "SEQ_SCAN ",
+                                          "timing":0.268286,
+                                          "cardinality":227994,
+                                          "extra_info": "title\n[INFOSEPARATOR]\ntitle\nid\n[INFOSEPARATOR]\nFilters: production_year>=2006 AND production_year<=2007 AND production_year IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 101132",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                          ]
+                                        }
+                                       ]
+                                     }
+,
+                                     {
+                                       "name": "FILTER",
+                                       "timing":0.006868,
+                                       "cardinality":93095,
+                                       "extra_info": "(movie_id BETWEEN 2 AND 2525745)\n[INFOSEPARATOR]\nEC: 352",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                        {
+                                          "name": "SEQ_SCAN ",
+                                          "timing":1.558729,
+                                          "cardinality":93095,
+                                          "extra_info": "cast_info\n[INFOSEPARATOR]\nperson_id\nmovie_id\nrole_id\n[INFOSEPARATOR]\nFilters: note=(voice: English version) AND note IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 352",
+                                          "timings": [
+                                          ],
+                                          "children": [
+                                          ]
+                                        }
+                                       ]
+                                     }
+                                    ]
+                                  }
+,
+                                  {
+                                    "name": "FILTER",
+                                    "timing":0.000406,
+                                    "cardinality":1,
+                                    "extra_info": "(id <= 11)\n[INFOSEPARATOR]\nEC: 1",
+                                    "timings": [
+                                    ],
+                                    "children": [
+                                     {
+                                       "name": "SEQ_SCAN ",
+                                       "timing":0.001553,
+                                       "cardinality":1,
+                                       "extra_info": "role_type\n[INFOSEPARATOR]\nid\n[INFOSEPARATOR]\nFilters: role=actress AND role IS NOT NULL\n\n[INFOSEPARATOR]\nEC: 1",
+                                       "timings": [
+                                       ],
+                                       "children": [
+                                       ]
+                                     }
+                                    ]
+                                  }
+                                 ]
+                               }
+                              ]
+                            }
+                           ]
+                         }
+                        ]
+                      }
+                     ]
+                   }
+                  ]
+                }
+               ]
+             }
+            ]
+          }
+         ]
+       }
+      ]
+    }
+   ]
+}
