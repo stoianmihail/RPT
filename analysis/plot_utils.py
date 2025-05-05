@@ -125,7 +125,7 @@ def extract_data_from_experiment(experiment_path, competitor_type, num_threads, 
           'query': query_id,
           'latency (s)': json_data.get('timing', None),
           # 'cout' : plan_utils.compute_cout(json_data),
-          '#made-it': plan_utils.compute_made_it(json_data),
+          '#made-it': plan_utils.compute_made_it(json_data, competitor_type),
           # 'base-size': plan_utils.compute_base_size(json_data),
           'extra-optimization-time (ns)': extra_optimization_time
         })
