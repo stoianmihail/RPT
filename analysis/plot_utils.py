@@ -95,6 +95,8 @@ def extract_data_from_experiment(experiment_path, competitor_type, num_threads, 
         
         json_path = os.path.join(mode_path, file)
 
+        print(f'json_path={json_path}')
+
         # Check if the file actually exists.
         if not os.path.isfile(json_path):
           return None        

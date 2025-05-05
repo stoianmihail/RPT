@@ -1,4 +1,5 @@
 import numpy as np
+import re
 
 def get_pk_fk_matrix(schema):
   n = len(schema)
@@ -138,7 +139,7 @@ class PlanParser:
 
   @property
   def version(self):
-    if self.competitor_type == 'rpt':
+    if self.competitor_type in ['rpt', 'duckdb']:
       return '0.9'
     return '1.2'
 
@@ -147,13 +148,59 @@ class PlanParser:
     default_ops = {'UNGROUPED_AGGREGATE', 'PROJECTION', 'HASH_GROUP_BY', 'ORDER_BY'}
     if self.version == '1.2':
       return default_ops
-    elif self.version == '0.9':
-      return {'RESULT_COLLECTOR'} + default_ops
+    if self.version == '0.9':
+      return {'RESULT_COLLECTOR', 'CREATE_BF'} | default_ops
     assert 0 
 
+  @property
+  def extra_operators(self):
+    if self.version == '1.2':
+      return [('operator_cardinality', 'exact-card'), ('cumulative_rows_scanned', 'base-size')]
+    if self.version == '0.9':
+      return [('cardinality', 'exact-card')]
+    assert 0
+
+  def get_table_name(self, node):
+    if self.version == '1.2':
+      assert 'Table' in node['extra_info']
+      return node['extra_info']['Table']
+    if self.version == '0.9':
+      return node['extra_info'].split('\n')[0]
+    assert 0
+
+  def get_est_card(self, node):
+    if self.version == '1.2':
+      return int(node['extra_info']['Estimated Cardinality'])
+    if self.version == '0.9':
+      match = re.search(r'EC:\s*(\d+)', node['extra_info'])
+      if match:
+        return int(match.group(1))
+      
+      assert node[self.__key__].strip() in ['COLUMN_DATA_SCAN']
+      return 0
+
+    assert 0
+
+  def get_join_type(self, node):
+    if self.version == '1.2':
+      return node['extra_info']['Join Type'].lower()
+    if self.version == '0.9':
+      print(f'node={node} | {node['extra_info']}')
+      pos = node['extra_info'].find('\n')
+      assert pos != -1
+      return node['extra_info'][:pos].lower()
+    assert 0
+
+  def get_join_conditions(self, node):
+    if self.version == '1.2':
+      return node['extra_info']['Conditions']
+    if self.version == '0.9':
+      return node['extra_info'].split('\n')[1]
+    assert 0
+
   # Add options if we have an analyzed plan.
-  def add_options(node, info):
-    for opt, label in [('operator_cardinality', 'exact-card'), ('cumulative_rows_scanned', 'base-size')]:
+  def add_options(self, node, info):
+    for opt, label in self.extra_operators:
       if opt in node:
         info[label] = int(node[opt])
     return info
@@ -166,7 +213,6 @@ class PlanParser:
       assert len(node['children']) == 1
       return self._impl_(node['children'][0], side_mask.copy(), build_rank)
     if node[self.__key__] == 'FILTER':
-      assert 'Estimated Cardinality' in node['extra_info']
       assert len(node['children']) == 1
 
       # Parse child.
@@ -176,20 +222,31 @@ class PlanParser:
         'type': 'filter',
         'name': None,
         'side-mask': side_mask,
-        'est-card': int(node["extra_info"]["Estimated Cardinality"]),
+        'est-card': self.get_est_card(node),
         'children': [child_plan]
       })
     
+    # The new operator (for RPT).
     if node[self.__key__] == 'USE_BF':
+      assert len(node['children']) == 1
 
+      # Parse child.
+      join_below_child, child_plan = self._impl_(node['children'][0], side_mask.copy(), build_rank)
+
+      return join_below_child, self.add_options(node, {
+        'type': 'filter',
+        'name': 'use-bf',
+        'side-mask': side_mask,
+        'est-card': None,
+        'children': [child_plan]
+      })
 
     # NOTE: Currently, there is a bug in DuckDB, that `SEQ_SCAN` has a trailing space to the right.
-    # NOTE: That's why we use `.strip()`.
+    # NOTE: That's why we use `.strip()`!
     if node[self.__key__].strip() in ['SEQ_SCAN', 'COLUMN_DATA_SCAN']:
       tab_name = 'dummy'
       if node[self.__key__].strip() == 'SEQ_SCAN':
-        assert 'Table' in node['extra_info']
-        tab_name = node['extra_info']['Table']
+        tab_name = self.get_table_name(node)
       
       # print(f'\n$$$$ TABLE $$$$')
       # print(f'tab_name={tab_name} ===> {to_bin(side_mask)}')
@@ -197,18 +254,22 @@ class PlanParser:
       assert tab_name is not None
       return False, self.add_options(node, {
         'type': node[self.__key__].strip().lower(),
-        "name": tab_name,
+        'name': tab_name,
         'side-mask': side_mask,
-        "est-card": int(node["extra_info"]["Estimated Cardinality"]),
+        'est-card': self.get_est_card(node)
       })
-    if node[self.__key__] == "HASH_JOIN":
+    
+    if node[self.__key__] == 'HASH_JOIN':
       assert len(node['children']) == 2
 
       # print(f'\n$$$$ JOIN {node['extra_info']['Conditions']} $$$$')
 
-      join_type = node['extra_info']['Join Type'].lower()
-      if join_type == 'mark':
-        assert '#' in node['extra_info']['Conditions']
+      join_type = self.get_join_type(node)
+
+      print(f'join_type={join_type}')
+
+      if join_type in ['mark', 'semi']:
+        assert '#' in self.get_join_conditions(node)
 
       if join_type == 'inner':
         # Build.
@@ -241,8 +302,10 @@ class PlanParser:
           )
 
         # print(f'@@@@@@ after revision')
-      elif join_type == 'mark':
-        # Build. This is always a `COLUMN_DATA_SCAN`.
+      elif join_type in ['mark', 'semi']:
+        # Build. This should always be a `COLUMN_DATA_SCAN`.
+        assert node['children'][1][self.__key__] == 'COLUMN_DATA_SCAN'
+
         join_below_build, build_plan = self._impl_(
           node['children'][1],
           side_mask.copy(),
@@ -275,46 +338,42 @@ class PlanParser:
         'join-type': join_type,
         'name': None,
         'side-mask': side_mask,
-        'cond': node['extra_info']['Conditions'],
-        'est-card': int(node['extra_info']['Estimated Cardinality']),
+        'cond': self.get_join_conditions(node),
+        'est-card': self.get_est_card(node),
         'children': children
       })
 
     # When we really find a new operator.    
     assert len(node['children']) == 1
-    raise ValueError(f"Unknown operator type: {node[self.__key__]}")
+    raise ValueError(f'Unknown operator type: {node[self.__key__]}')
 
-  def parse_v0_9(self, json_plan):
-    assert 0
-
-  def parse_v1_2(self, json_plan):
+  def parse(self, json_plan):
     # This is the snt
     self.__key__ = None
 
+    print(f'version={self.version}')
+
     # EXPLAIN ANALYZE?
     plan_to_parse = None
-    if 'latency' in json_plan:
+    if self.version == '1.2':
+      if 'latency' in json_plan:
+        plan_to_parse = json_plan['children'][0].copy()
+        self.__key__ = 'operator_name'
+      else:
+        # Just EXPLAIN.
+        plan_to_parse = json_plan.copy()
+        self.__key__ = 'name'
+    elif self.version == '0.9':
       plan_to_parse = json_plan['children'][0].copy()
-      __key__ = 'operator_name'
-    else:
-      # Just EXPLAIN.
-      plan_to_parse = json_plan.copy()
-      __key__ = 'name'
+      self.__key__ = 'name'
     assert plan_to_parse is not None
+
+    print(plan_to_parse)
 
     _, parsed_plan = self._impl_(plan_to_parse, [], 1)
 
     # And return.
     return parsed_plan
-
-  def parse(self, json_plan):
-    # For RPT, we need to parse DuckDB v0.9[.2] plans.
-    if self.get_version() == '0.9':
-      return self.parse_v0_9(json_plan)
-    
-    # For the rest, we based everything on DuckDB v1.2[.0].
-    assert self.get_version() == '1.2'
-    return self.parse_v1_2(json_plan)
   
 def get_sides(plan):
   assert plan['type'] == 'join'
@@ -398,10 +457,11 @@ def compute_cout(json_plan):
 
       if plan['join-type'] == 'inner':
         return True, plan['exact-card'] + b_cout + p_cout
-      elif plan['join-type'] == 'mark':
-        # NOTE: We assume that this comes from a MARK-JOIN for `IN`-clauses.
-        # NOTE: WE don't take its cardinality, since it's a fake join.
-        # NOTE: In the regular case, there should be no join below us.
+      elif plan['join-type'] in ['mark', 'semi']:
+        # Note: We assume that this comes from a MARK-JOIN for `IN`-clauses.
+        # Note: In DuckDB v0.9.2, this could also be a SEMI-JOIN. But we only make sure that this happens with a COLUMN_DATA_SCAN.
+        # Note: We don't take its cardinality, since it's a fake join.
+        # Note: In the regular case, there should be no join below us.
         assert not (join_below_build or join_below_probe)
         return join_below_build or join_below_probe, b_cout + p_cout
       else:
@@ -435,7 +495,7 @@ def compute_made_it(json_plan, competitor_type):
       assert len(plan['children']) == 1
       join_below_child, table_size = compute_made_it_impl(plan['children'][0])
       if not join_below_child:
-        # Return myself.
+        # Return myself, i.e., *this filter's cardinality* (since it's pushed down).
         return join_below_child, plan['exact-card']
 
       # If there is a join below, we just forward what we found.
@@ -452,10 +512,12 @@ def compute_made_it(json_plan, competitor_type):
       if plan['join-type'] == 'inner':
         # Then set the join flag and add.
         return True, l + r
-      elif plan['join-type'] == 'mark':
+      elif plan['join-type'] in ['mark', 'semi']:
         # Propagate the OR.
         return (join_below_left or join_below_right), max(l, r)
 
+    print('what/???')
+    print(plan['type'])
     assert 0
 
   plan_parser = PlanParser(competitor_type)
@@ -489,7 +551,7 @@ def compute_base_size(json_plan):
       if plan['join-type'] == 'inner':
         # Then set the join flag and add.
         return True, l + r
-      elif plan['join-type'] == 'mark':
+      elif plan['join-type'] in ['mark', 'semi']:
         # Propagate the OR.
         return (join_below_left or join_below_right), max(l, r)
 
