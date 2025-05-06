@@ -185,7 +185,6 @@ class PlanParser:
     if self.version == '1.2':
       return node['extra_info']['Join Type'].lower()
     if self.version == '0.9':
-      print(f'node={node} | {node['extra_info']}')
       pos = node['extra_info'].find('\n')
       assert pos != -1
       return node['extra_info'][:pos].lower()

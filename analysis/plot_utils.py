@@ -78,8 +78,8 @@ def extract_data_from_experiment(experiment_path, data_name, competitor_type, nu
   config_str = config_to_str(competitor_type, config)
 
   acc_filepath = os.path.join(experiment_path, 'acc.csv')
-  # if os.path.isfile(acc_filepath):
-  #   return pd.read_csv(acc_filepath)
+  if os.path.isfile(acc_filepath):
+    return pd.read_csv(acc_filepath)
 
   # Read the table sizes.
   table_sizes = utils.read_json(os.path.join('parachute-data', data_name, 'data-table-sizes.json'))
