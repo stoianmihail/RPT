@@ -84,7 +84,7 @@ duckdb_benchmark_data/
 *.lo
 *.la
 *~
-*.pdf
+# *.pdf
 *.swp
 a.out
 
