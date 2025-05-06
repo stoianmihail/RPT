@@ -212,6 +212,8 @@ class PlanParser:
     if node[self.__key__] in self.fallthrough_operators:
       assert len(node['children']) == 1
       return self._impl_(node['children'][0], side_mask.copy(), build_rank)
+    
+    # Filter.
     if node[self.__key__] == 'FILTER':
       assert len(node['children']) == 1
 
@@ -264,10 +266,10 @@ class PlanParser:
 
       # print(f'\n$$$$ JOIN {node['extra_info']['Conditions']} $$$$')
 
+      # Get the join type.
       join_type = self.get_join_type(node)
 
-      print(f'join_type={join_type}')
-
+      # Make sure there is a weird attribute for this type of joins.
       if join_type in ['mark', 'semi']:
         assert '#' in self.get_join_conditions(node)
 
@@ -515,9 +517,6 @@ def compute_made_it(json_plan, competitor_type):
       elif plan['join-type'] in ['mark', 'semi']:
         # Propagate the OR.
         return (join_below_left or join_below_right), max(l, r)
-
-    print('what/???')
-    print(plan['type'])
     assert 0
 
   plan_parser = PlanParser(competitor_type)
@@ -525,11 +524,16 @@ def compute_made_it(json_plan, competitor_type):
   ret = compute_made_it_impl(parsed_plan)
   return ret[1]
 
-def compute_base_size(json_plan):
-  def compute_base_size_impl(plan):
+def compute_base_size(json_plan, competitor_type, table_sizes):
+  def compute_base_size_impl(parser, plan):
     # Table scan.
     if plan['type'] == 'seq_scan':
-      return False, plan['base-size']
+      if parser.version == '1.2':
+        return False, plan['base-size']
+      if parser.version == '0.9':
+        assert plan['name'] in table_sizes
+        return False, table_sizes[plan['name']]
+      assert 0
     
     if plan['type'] == 'column_data_scan':
       return False, 0
@@ -538,14 +542,14 @@ def compute_base_size(json_plan):
       assert len(plan['children']) == 1
       # NOTE: I mean, we could also eliminate filters, but duckdb also has the dynamic filters.
       # NOTE: In principle, we could detect them..
-      return compute_base_size_impl(plan['children'][0])
+      return compute_base_size_impl(parser, plan['children'][0])
 
     if plan['type'] == 'join':
       # Join.
       build_side, probe_side = get_sides(plan)
 
-      (join_below_left, l) = compute_base_size_impl(build_side)
-      (join_below_right, r) = compute_base_size_impl(probe_side)
+      (join_below_left, l) = compute_base_size_impl(parser, build_side)
+      (join_below_right, r) = compute_base_size_impl(parser, probe_side)
 
       # Inner-join?
       if plan['join-type'] == 'inner':
@@ -557,8 +561,9 @@ def compute_base_size(json_plan):
 
     assert 0
 
-  parsed_plan = parse_plan(json_plan)
-  ret = compute_base_size_impl(parsed_plan)
+  parser = PlanParser(competitor_type)
+  parsed_plan = parser.parse(json_plan)
+  ret = compute_base_size_impl(parser, parsed_plan)
   return ret[1]
 
 # def compute_base_size(json_plan):

@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import utils
 import pandas as pd
 import plan_utils
 
@@ -72,13 +73,16 @@ def get_latest_experiments_of_competitor(competitor_type, base_path):
 
   return latest_experiments
 
-def extract_data_from_experiment(experiment_path, competitor_type, num_threads, folder, config):
+def extract_data_from_experiment(experiment_path, data_name, competitor_type, num_threads, folder, config):
   results = []
   config_str = config_to_str(competitor_type, config)
 
   acc_filepath = os.path.join(experiment_path, 'acc.csv')
   # if os.path.isfile(acc_filepath):
   #   return pd.read_csv(acc_filepath)
+
+  # Read the table sizes.
+  table_sizes = utils.read_json(os.path.join('parachute-data', data_name, 'data-table-sizes.json'))
 
   for mode in ['cold', 'hot']:
     print(f'!!!! mode={mode}!!!!!')
@@ -128,7 +132,7 @@ def extract_data_from_experiment(experiment_path, competitor_type, num_threads, 
           'latency (s)': json_data.get('timing', None),
           # 'cout' : plan_utils.compute_cout(json_data),
           '#made-it': plan_utils.compute_made_it(json_data, competitor_type),
-          # 'base-size': plan_utils.compute_base_size(json_data),
+          'base-size': plan_utils.compute_base_size(json_data, competitor_type, table_sizes),
           'extra-optimization-time (ns)': extra_optimization_time
         })
 
@@ -208,7 +212,7 @@ def collect_data(root_path, data_name, workload_name, machines, list_num_threads
               workload_dir,
               workload_threads_dir,
               exp_dir
-            ), competitor_type, num_threads, folder, config)
+            ), data_name, competitor_type, num_threads, folder, config)
             if curr_data is None:
               continue
             all_data = pd.concat([all_data, curr_data])
